@@ -3,6 +3,7 @@ from skimage.metrics import peak_signal_noise_ratio as psnr
 import numpy as np
 import torch
 
+
 def metric_ssim(result, expected):
     """
     Returns the ssim (structural similarity index) of the result
@@ -33,16 +34,17 @@ def metric_ssim(result, expected):
 def metric_sam(pred, target):
     """Returns the sam of the result"""
 
-    assert (pred.shape == target.shape), f"Pred and Target must have equal shape, have {pred.shape} and {target.shape}"
+    assert (
+        pred.shape == target.shape
+    ), f"Pred and Target must have equal shape, have {pred.shape} and {target.shape}"
 
     result = []
 
     for i in range(pred.shape[2]):
-        result.append(sam(pred[:,:,i], target[:,:,i])[0])
+        result.append(sam(pred[:, :, i], target[:, :, i])[0])
 
     return torch.stack(result).mean()
 
+
 def metric_psnr(pred, target):
-    return psnr(pred, target, data_range=pred.max()-pred.min())
-
-
+    return psnr(pred, target, data_range=pred.max() - pred.min())
