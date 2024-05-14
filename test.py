@@ -1,4 +1,4 @@
-from dataset import IcasspDataset
+from dataset import IcasspDataModule
 from networks.baseline import Baseline
 from torch.utils.data import DataLoader
 import torch
@@ -9,21 +9,21 @@ from transforms.get import get_transform
 res = 128
 bands = 31
 
-train = IcasspDataset(
-    "/home/erittner/docs/IC/icassp/data/processed/",
-    transform=get_transform("crop(128, 512)|res(128, 256)|bands(4, 31)"),
-    res=res,
-    bands=bands,
-)
-test = IcasspDataset(
-    "/home/erittner/docs/IC/icassp/data/test/",
-    transform=get_transform("crop(128, 512)|res(128, 256)|bands(4, 31)"),
-    res=res,
-    bands=bands,
-)
+hparams = {
+    "data_path": "/home/eduardo/data",
+    "transform": "crop(128, 512)|res(128, 256)|bands(4, 31)",
+    "res": 256,
+    "bands": 31,
+    "batch_size": 1,
+    "nworkers": 2,
+}
 
-train_loader = DataLoader(train, batch_size=1, shuffle=True)
-test_loader = DataLoader(test, batch_size=1, shuffle=True)
+dataloader = IcasspDataModule(hparams)
+
+dataloader.setup()
+
+train_loader = dataloader.train_dataloader()
+test_loader = dataloader.test_dataloader()
 
 device = (
     "cuda"

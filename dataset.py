@@ -1,5 +1,5 @@
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from glob import glob
 from os import path
@@ -7,6 +7,7 @@ from typing import Optional, List, Tuple, Callable
 import pywt
 from pytorch_lightning import LightningDataModule
 import pytorch_lightning as pl
+from transforms.get import get_transform
 
 
 class IcasspDataModule(LightningDataModule):
@@ -15,20 +16,56 @@ class IcasspDataModule(LightningDataModule):
         self.save_hyperparameters(hparams)
 
     def setup(self, stage=None):
-        # TODO: Read transforms and shit from hparams
         base_path = self.hparams.data_path
 
-        train_transform = None
-        train_preprocessing = None
-        res = 256
+        train_transform = get_transform(self.hparams.transform)
+        train_preprocessing = None  # Do we really need preprocessing?
+        res = self.hparams.res
+        bands = self.hparams.bands
+
         self.train = IcasspDataset(
             path.join(base_path, "train"),
             train_transform,
             train_preprocessing,
             res,
-            crop_strategy,
             bands,
-            bands_strategy,
+        )
+
+        self.val = IcasspDataset(
+            path.join(base_path, "val"),
+            train_transform,
+            train_preprocessing,
+            res,
+            bands,
+        )
+
+        self.test = IcasspDataset(
+            path.join(base_path, "test"),
+            train_transform,
+            train_preprocessing,
+            res,
+            bands,
+        )
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train,
+            batch_size=self.hparams.batch_size,
+            num_workers=self.hparams.nworkers,
+        )
+
+    def val_dataloader(self):
+        return DataLoader(
+            self.val,
+            batch_size=self.hparams.batch_size,
+            num_workers=self.hparams.nworkers,
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            self.test,
+            batch_size=self.hparams.batch_size,
+            num_workers=self.hparams.nworkers,
         )
 
 
@@ -40,9 +77,7 @@ class IcasspDataset(Dataset):
         preprocessing: Optional[str] = None,
         fold: Optional[int] = None,
         res: Optional[int] = 256,
-        crop_strategy: Optional[str] = "center",
         bands: Optional[int] = 31,
-        bands_strategy: Optional[str] = None,
         **kwargs,
     ):
         super().__init__()
@@ -55,9 +90,7 @@ class IcasspDataset(Dataset):
         self.preprocessing = preprocessing
         self.fold = fold
         self.res = res
-        self.crop_strategy = crop_strategy
         self.bands = bands
-        self.bands_strategy = bands_strategy
 
         if self.preprocessing is None:
             fmt = "*.npy"
@@ -94,107 +127,6 @@ class IcasspDataset(Dataset):
 
     def __len__(self) -> int:
         return self.total_files
-
-    def preprocess_res(self, image: np.ndarray) -> np.ndarray:
-        current_res = image.shape[0]
-        if current_res == self.res:
-            return image
-
-        if current_res < self.res:
-            return self.upsample_res(image, self.res)
-
-        ratio = current_res // self.res
-        assert ratio % 2 == 0, f"New resolution {self.res} must be a power of 2"
-
-        return image[::ratio, ::ratio, :]
-
-    def upsample_res(self, image: np.ndarray, new_res: int) -> np.ndarray:
-        """
-        Upscales the given image to new_res value
-        expects image of shape [spatial][spatial][spectral]
-        """
-
-        res = (image.shape[0], image.shape[1])
-        ratio = new_res // res[0]
-
-        assert ratio > 1, "New res must be at least 2 times bigger than current res"
-
-        result_type = image.dtype
-        result_shape = (new_res, new_res, image.shape[2])
-        result = np.empty(result_shape, dtype=result_type)
-
-        for i in range(ratio):
-            for j in range(ratio):
-                result[i::ratio, j::ratio, :] = image
-
-        return result
-
-    def preprocess_bands(self, image: np.ndarray) -> np.ndarray:
-        current_bands = image.shape[2]
-
-        if current_bands == self.bands:
-            return image
-
-        if current_bands < self.bands:
-            return self.upsample_band(image, self.bands)
-
-        if self.bands_strategy is None:
-            return image[:, :, 8:39]  # Considering blue starts at around 470nm
-
-        else:
-            assert False, "No other bands strategy implemented"
-
-    def upsample_band(
-        self,
-        image: np.ndarray,
-        new_bands: int,
-        band_index: Optional[List[int]] = [7, 14, 30, 31],
-    ) -> np.ndarray:
-        """
-        Upsamples the given image to have number of bands equal to new_bands
-        Expectes images of shape [spatial][spatial][spectral]
-        """
-
-        # band_index is a list of the current image's bands' corresponding
-        # indexes in the resulting image. This is done for when the band
-        # frequencies are not evenly spaced
-
-        result_shape = (image.shape[0], image.shape[1], new_bands)
-        result = np.empty(result_shape)
-
-        assert (
-            new_bands > image.shape[2]
-        ), "Number of bands must be higher than the original picture"
-        assert len(band_index) == image.shape[2]
-        "Number of band indexes must be equal to number of bands in the image"
-
-        previous = -1
-        next = 0
-        cutoff = 0
-
-        for i in range(new_bands):
-            if next < len(band_index) and i > band_index[next]:
-                next += 1
-                previous += 1
-                if next == len(band_index):
-                    cutoff = new_bands
-                else:
-                    cutoff = (
-                        band_index[previous]
-                        + (band_index[next] - band_index[previous]) // 2
-                    )
-
-            if i >= cutoff:
-                result[:, :, i] = image[:, :, next]
-
-            else:
-                result[:, :, i] = image[:, :, previous]
-
-        return result
-
-    def choose_center(self, image: np.ndarray) -> np.ndarray:
-        res = image.shape[0]
-        return image[res // 4 : res * 3 // 4, res // 4 : res * 3 // 4, :]
 
     def load_image(
         self, msi_in_path: str, rgb_in_path: str, msi_out_path: str
