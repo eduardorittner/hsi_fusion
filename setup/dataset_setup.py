@@ -16,7 +16,7 @@ from tqdm import tqdm
 def save2np(file, dest_path):
     rgb_in_path = path.join(dest_path, "rgb_in")
     msi_in_path = path.join(dest_path, "msi_in")
-    msi_out_path_path = path.join(dest_path, "msi_out_path")
+    msi_out_path = path.join(dest_path, "msi_out_path")
 
     if not path.isdir(rgb_in_path):
         os.mkdir(rgb_in_path)
@@ -39,7 +39,7 @@ def save2np(file, dest_path):
             ]  # Skip 35th band since it's a duplicate of 36
             msi_out = np.concatenate((msi_out_vis, msi_out_nir), axis=0).T
 
-            msi_in = msi_out[:, ::4, ::4]
+            msi_in = msi_out[:: 4, ::4, :]
 
             np.save(path.join(rgb_in_path, key), rgb_in)
             np.save(path.join(msi_in_path, key), msi_in)
