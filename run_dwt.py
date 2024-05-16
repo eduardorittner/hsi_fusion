@@ -76,9 +76,9 @@ def save_results(results: Dict, dir: str):
     with open(join(dir, "results" + date + ".txt"), "w") as f:
         f.write(
             f"""Method: {results['method']}
-        Wavelet: {results['wavelet']}
-        Level: {results['level']}
-        -----------------------"""
+Wavelet: {results['wavelet']}
+Level: {results['level']}
+-----------------------\n"""
         )
 
         if "ssim" in results.keys():
@@ -87,12 +87,12 @@ def save_results(results: Dict, dir: str):
             f.write(f"Average: {metrics[0]}\n")
             for i in range(1, len(metrics)):
                 f.write(f"Band {i-1}: {metrics[i]}\n")
-            f.write("-----------------------")
+            f.write("-----------------------\n")
 
         if "sam" in results.keys():
             f.write("SAM\n")
             f.write(f"{results['sam']}\n")
-            f.write("-----------------------")
+            f.write("-----------------------\n")
 
         if "psnr" in results.keys():
             f.write("PSNR\n")
