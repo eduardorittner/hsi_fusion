@@ -126,6 +126,11 @@ if __name__ == "__main__":
     msi_out_files = sorted(glob.glob(join(args.source, "msi_out/*.npy")))
 
     method = args.method
+
+    if method != "3d-dwt":
+        print(f"ERROR: {method} not implemented")
+        exit(1)
+
     if args.wavelet is not None:
         wavelet = args.wavelet.split(",")
     else:
