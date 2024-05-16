@@ -59,8 +59,6 @@ metric(s): {metrics} stored in {dir}
         if "psnr" in metrics:
             results["psnr"][image_id(rgb_in_files[i])] = metric_psnr(result, expected)
 
-        break
-
     if "ssim" in metrics:
         results["ssim"] = metric_join_ssim(results["ssim"])
     if "sam" in metrics:

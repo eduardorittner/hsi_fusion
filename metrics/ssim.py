@@ -19,7 +19,7 @@ def metric_ssim(result: np.ndarray, expected: np.ndarray) -> List[float]:
     )
 
     for i in range(result.shape[2]):
-        results[i] = ssim(
+        results[i + 1] = ssim(
             result[:, :, i],
             expected[:, :, i],
             data_range=result[:, :, i].max() - result[:, :, i].min(),
@@ -34,6 +34,6 @@ def metric_join_ssim(results: Dict) -> np.ndarray:
     for value in results.values():
         r += value
 
-    r /= len(results)
+    r /= len(results.keys())
 
     return r
