@@ -72,10 +72,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    print(
-        f"Loading files from train file: {args.train_source_file} into: {args.dest_dir}"
-    )
-    save2np(args.train_source_file, args.dest_dir)
-
-    print(f"Loading files from val file: {args.val_source_file} into: {args.dest_dir}")
-    save2np(args.val_source_file, args.dest_dir)
+    if args.val_source_file is not None:
+        print(f"Loading files from val file: {args.val_source_file} into: {args.dest_dir}")
+        save2np(args.val_source_file, args.dest_dir)
