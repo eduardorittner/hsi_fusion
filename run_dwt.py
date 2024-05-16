@@ -72,7 +72,7 @@ metric(s): {metrics} stored in {dir}
 
 
 def save_results(results: Dict, dir: str):
-    date = datetime.today().strftime("%Y-%m-%d")
+    date = datetime.today().strftime("%Y-%m-%d-%s")
     with open(join(dir, "results" + date + ".txt"), "w") as f:
         f.write(
             f"""Method: {results['method']}
