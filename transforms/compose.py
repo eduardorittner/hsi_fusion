@@ -1,4 +1,4 @@
-from typing import List, Any, Tuple
+from typing import List, Any, Tuple, Optional
 import numpy as np
 
 
@@ -7,8 +7,8 @@ class Compose:
         self.transform_list = transform_list
 
     def __call__(
-        self, x: np.ndarray, y: np.ndarray, z: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        self, x: np.ndarray, y: np.ndarray, z: Optional[np.ndarray]
+    ) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
         for transform in self.transform_list:
             x, y, z = transform(x, y, z)
 

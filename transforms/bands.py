@@ -57,7 +57,7 @@ class Bands:
 
         return result
 
-    def preprocess_msi(self, image: np.ndarray) -> np.ndarray:
+    def preprocess_bands(self, image: np.ndarray, bands: int) -> np.ndarray:
         current_bands = image.shape[2]
 
         if current_bands == self.high_bands:
@@ -72,17 +72,21 @@ class Bands:
         else:
             assert False, "No other bands strategy implemented"
 
-    def preprocess_rgb(self, image: np.ndarray) -> np.ndarray:
-        return image[:, :, : self.low_bands]
-
     def __call__(
-        self, x: np.ndarray, y: np.ndarray, z: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        return (
-            self.preprocess_rgb(x),
-            self.preprocess_msi(y),
-            self.preprocess_msi(z),
-        )
+        self, x: np.ndarray, y: np.ndarray, z: Optional[np.ndarray]
+    ) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
+        if z is not None:
+            return (
+                self.preprocess_bands(x, self.low_bands),
+                self.preprocess_bands(y, self.high_bands),
+                self.preprocess_bands(z, self.high_bands),
+            )
+        else:
+            return (
+                self.preprocess_bands(x, self.low_bands),
+                self.preprocess_bands(y, self.high_bands),
+                None,
+            )
 
     def __str__(self) -> str:
         return f"High bands: {high_bands}, Low bands: {low_bands}"

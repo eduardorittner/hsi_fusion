@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from typing import Tuple
+from typing import Tuple, Optional
 
 
 class Resolution:
@@ -43,13 +43,20 @@ class Resolution:
         return image[::ratio, ::ratio, :]
 
     def __call__(
-        self, x: np.ndarray, y: np.ndarray, z: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        return (
-            self.preprocess_res(x, self.high_res),
-            self.preprocess_res(y, self.low_res),
-            self.preprocess_res(z, self.high_res),
-        )
+        self, x: np.ndarray, y: np.ndarray, z: Optional[np.ndarray]
+    ) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
+        if z is not None:
+            return (
+                self.preprocess_res(x, self.high_res),
+                self.preprocess_res(y, self.low_res),
+                self.preprocess_res(z, self.high_res),
+            )
+        else:
+            return (
+                self.preprocess_res(x, self.high_res),
+                self.preprocess_res(y, self.low_res),
+                None,
+            )
 
     def __str__(self) -> str:
         return f"High resolution: {high_res}, Low resolution: {low_res}"
