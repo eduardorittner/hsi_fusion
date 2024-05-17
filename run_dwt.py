@@ -4,6 +4,7 @@ from os.path import join, isdir
 from tqdm import trange
 import glob
 from typing import Dict, List, Callable
+from transforms.get import get_transform
 from transforms.resolution import Resolution
 from transforms.bands import Bands
 from transforms.compose import Compose
@@ -12,6 +13,7 @@ from metrics.sam import metric_sam, metric_join_sam
 from metrics.psnr import metric_psnr, metric_join_psnr
 import numpy as np
 from utils.image_id import image_id
+from utils import read_yaml
 from datetime import datetime
 
 
@@ -19,6 +21,7 @@ def run_dwt(
     rgb_in: List[str],
     msi_in: List[str],
     msi_out: List[str],
+    method: str,
     wavelet: type[List[str] | str],
     level: int,
     metrics: List[str],
@@ -106,49 +109,67 @@ if __name__ == "__main__":
         description="Runs the given fusion method and calculates the given metrics",
     )
 
-    parser.add_argument("source", type=str, help="Source directory")
+    parser.add_argument("-s", "--source", type=str, help="Source directory")
     parser.add_argument("-m", "--method", type=str, help="Fusion method")
     parser.add_argument("-w", "--wavelet", type=str, help="Wavelet")
     parser.add_argument("-l", "--level", type=int, help="dwt level")
     parser.add_argument("-d", "--dir", type=str, help="Where results are stored")
     parser.add_argument("-e", "--metrics", type=str, help="Which metrics to compute")
+    parser.add_argument("-c", "--config", type=str, help="Path to config")
 
     args = parser.parse_args()
 
-    if not isdir(args.source):
-        print(f"ERROR: Directory {args.source} does not exist.")
-        exit(1)
+    if args.config is not None:
+        # Read from config file
+        config = read_yaml(args.config)
+        results = run_dwt(
+            config["rgb_in_files"],
+            config["msi_in_files"],
+            config["msi_out_files "],
+            config["method"],
+            config["wavelet"],
+            config["level"],
+            config["metrics"],
+            config["dir"],
+            get_transform(config["transforms"]),
+        )
 
-    rgb_in_files = sorted(glob.glob(join(args.source, "rgb_in/*.npy")))
-    msi_in_files = sorted(glob.glob(join(args.source, "msi_in/*.npy")))
-    msi_out_files = sorted(glob.glob(join(args.source, "msi_out/*.npy")))
-
-    method = args.method
-
-    if method != "3d-dwt":
-        print(f"ERROR: {method} not implemented")
-        exit(1)
-
-    if args.wavelet is not None:
-        wavelet = args.wavelet.split(",")
     else:
-        print("ERROR: Must provide wavelet")
-        exit(1)
-    level = args.level
-    dir = args.dir
+        if not isdir(args.source):
+            print(f"ERROR: Directory {args.source} does not exist.")
+            exit(1)
 
-    if args.metrics is not None:
-        metrics = args.metrics.split(",")
-    else:
-        print("ERROR: Must provide metrics")
-        exit(1)
+        rgb_in_files = sorted(glob.glob(join(args.source, "rgb_in/*.npy")))
+        msi_in_files = sorted(glob.glob(join(args.source, "msi_in/*.npy")))
+        msi_out_files = sorted(glob.glob(join(args.source, "msi_out/*.npy")))
 
-    transforms = Compose([Resolution(1024, 1024), Bands(61, 61, None)])
+        method = args.method
+
+        if method != "3d-dwt":
+            print(f"ERROR: {method} not implemented")
+            exit(1)
+
+        if args.wavelet is not None:
+            wavelet = args.wavelet.split(",")
+        else:
+            print("ERROR: Must provide wavelet")
+            exit(1)
+        level = args.level
+        dir = args.dir
+
+        if args.metrics is not None:
+            metrics = args.metrics.split(",")
+        else:
+            print("ERROR: Must provide metrics")
+            exit(1)
+
+        transforms = Compose([Resolution(1024, 1024), Bands(61, 61, None)])
 
     results = run_dwt(
         rgb_in_files,
         msi_in_files,
         msi_out_files,
+        method,
         wavelet,
         level,
         metrics,

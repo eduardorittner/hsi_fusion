@@ -11,6 +11,9 @@ def get_transform(transform: str):
     if transform == "512x31_512x4":
         return Compose([Bands(4, 31, None), Resolution(512, 512)])
 
+    if transform == "1024x61_1024x61":
+        return Compose([Resolution(1024, 1024), Bands(61, 61, None)])
+
     if transform == "crop(128, 512)|res(128, 256)|bands(4, 31)":
         return Compose(
             [
