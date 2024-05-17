@@ -13,14 +13,14 @@ from metrics.sam import metric_sam, metric_join_sam
 from metrics.psnr import metric_psnr, metric_join_psnr
 import numpy as np
 from utils.image_id import image_id
-from utils import read_yaml
+from utils.read_yaml import read_yaml
 from datetime import datetime
 
 
 def run_dwt(
-    rgb_in: List[str],
-    msi_in: List[str],
-    msi_out: List[str],
+    rgb_in_files: List[str],
+    msi_in_files: List[str],
+    msi_out_files: List[str],
     method: str,
     wavelet: type[List[str] | str],
     level: int,
@@ -40,7 +40,7 @@ def run_dwt(
 
     print(
         f"""
-Reading files from: {args.source}
+Reading files from: {rgb_in_files[0].split("/")[-3]}
 dwt with wavelet(s): {wavelet}, level: {level}
 metric(s): {metrics} stored in {dir}
     """
@@ -62,11 +62,11 @@ metric(s): {metrics} stored in {dir}
         if "psnr" in metrics:
             results["psnr"][image_id(rgb_in_files[i])] = metric_psnr(result, expected)
 
-    if "ssim" in metrics:
+    if "ssim" in results:
         results["ssim"] = metric_join_ssim(results["ssim"])
-    if "sam" in metrics:
+    if "sam" in results:
         results["sam"] = metric_join_sam(results["sam"])
-    if "psnr" in metrics:
+    if "psnr" in results:
         results["psnr"] = metric_join_psnr(results["psnr"])
 
     save_results(results, dir)
@@ -103,29 +103,67 @@ Level: {results['level']}
             f.write("-----------------------")
 
 
+def run_dwt_suite(dir: str):
+    config_files = sorted(glob.glob(join(dir, "*.yaml")))
+    for file in config_files:
+        config = read_yaml(file, False)
+        print(f"Running {file}")
+        rgb_in_files = sorted(glob.glob(join(config["rgb_in_files"], "*.npy")))
+        msi_in_files = sorted(glob.glob(join(config["msi_in_files"], "*.npy")))
+        msi_out_files = sorted(glob.glob(join(config["msi_out_files"], "*.npy")))
+        results = run_dwt(
+            rgb_in_files,
+            msi_in_files,
+            msi_out_files,
+            config["method"],
+            config["wavelet"],
+            config["level"],
+            config["metrics"],
+            config["dir"],
+            get_transform(config["transforms"]),
+        )
+        print("Results calculated:")
+        if "ssim" in results.keys():
+            print(f"SSIM: {results['ssim'][0]}")
+        if "sam" in results.keys():
+            print(f"sam: {results['sam']}")
+        if "psnr" in results.keys():
+            print(f"psnr: {results['psnr']}")
+        print("------------------")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="fusion-runner",
         description="Runs the given fusion method and calculates the given metrics",
     )
 
-    parser.add_argument("-s", "--source", type=str, help="Source directory")
+    parser.add_argument("-o", "--source", type=str, help="Source directory")
     parser.add_argument("-m", "--method", type=str, help="Fusion method")
     parser.add_argument("-w", "--wavelet", type=str, help="Wavelet")
     parser.add_argument("-l", "--level", type=int, help="dwt level")
     parser.add_argument("-d", "--dir", type=str, help="Where results are stored")
     parser.add_argument("-e", "--metrics", type=str, help="Which metrics to compute")
     parser.add_argument("-c", "--config", type=str, help="Path to config")
+    parser.add_argument("-s", "--suite", type=str, help="Path to configs")
 
     args = parser.parse_args()
 
+    if args.suite is not None:
+        run_dwt_suite(args.suite)
+        exit(0)
+
     if args.config is not None:
         # Read from config file
-        config = read_yaml(args.config)
+        config = read_yaml(args.config, False)
+        rgb_in_files = sorted(glob.glob(join(config["rgb_in_files"], "*.npy")))
+        msi_in_files = sorted(glob.glob(join(config["msi_in_files"], "*.npy")))
+        msi_out_files = sorted(glob.glob(join(config["msi_out_files"], "*.npy")))
+
         results = run_dwt(
-            config["rgb_in_files"],
-            config["msi_in_files"],
-            config["msi_out_files "],
+            rgb_in_files,
+            msi_in_files,
+            msi_out_files,
             config["method"],
             config["wavelet"],
             config["level"],
