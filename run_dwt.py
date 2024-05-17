@@ -118,7 +118,7 @@ def run_dwt_suite(dir: str):
             config["method"],
             config["wavelet"],
             config["level"],
-            config["metrics"],
+            config["metrics"].split(","),
             config["dir"],
             get_transform(config["transforms"]),
         )
@@ -167,7 +167,7 @@ if __name__ == "__main__":
             config["method"],
             config["wavelet"],
             config["level"],
-            config["metrics"],
+            config["metrics"].split(","),
             config["dir"],
             get_transform(config["transforms"]),
         )
