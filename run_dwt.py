@@ -1,6 +1,5 @@
 from dwt.dwt import fuse_3dDWT
 import argparse
-import json
 from os.path import join, isdir
 from os import mkdir
 from tqdm import trange
@@ -33,7 +32,6 @@ def run_dwt(
 
     if isinstance(wavelet, str):
         wavelet_str = wavelet
-        print("wa")
     else:
         wavelet_str = ""
         for wav in wavelet:
@@ -43,8 +41,10 @@ def run_dwt(
 
     dir = dir + wavelet_str
 
-    print(dir)
-    mkdir(dir)
+    if isdir(dir):
+        pass
+    else:
+        mkdir(dir)
 
     with open(join(dir, "method.txt"), "w") as f:
         f.write(
@@ -86,18 +86,7 @@ metric(s): {metrics} stored in {dir}
 
 
 def save_image_result(image_id: str, results: Dict, dir: str):
-    with open(join(dir, image_id + ".json"), "w") as f:
-        json.dump(results, f)
-
-
-def aggregate_results(dir: str):
-    results = {}
-    files = sorted(glob.glob(dir + "*.json"))
-    for file in files:
-        id = image_id(file)
-        results[id] = json.load(file)
-
-    return results
+    np.save(join(dir, image_id), np.array(results))
 
 
 def save_results(results: Dict, dir: str):
@@ -127,6 +116,9 @@ Level: {results['level']}
             f.write("PSNR\n")
             f.write(f"{results['psnr']}\n")
             f.write("-----------------------")
+
+
+# def recover_dwt(dir: str):
 
 
 def run_dwt_suite(dir: str):
