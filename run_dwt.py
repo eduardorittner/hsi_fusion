@@ -31,18 +31,29 @@ def run_dwt(
     transforms: Callable,
 ):
 
-    if wavelet is str:
+    if isinstance(wavelet, str):
         wavelet_str = wavelet
+        print("wa")
     else:
         wavelet_str = ""
         for wav in wavelet:
             wavelet_str += wav
             wavelet_str += "-"
+        wavelet_str = wavelet_str[:-1]
 
     dir = dir + wavelet_str
 
     print(dir)
-    # mkdir(dir)
+    mkdir(dir)
+
+    with open(join(dir, "method.txt"), "w") as f:
+        f.write(
+            f"""
+Reading files from: {rgb_in_files[0].split("/")[-3]}
+dwt with wavelet(s): {wavelet}, level: {level}
+metric(s): {metrics} stored in {dir}
+"""
+        )
 
     print(
         f"""
@@ -77,6 +88,16 @@ metric(s): {metrics} stored in {dir}
 def save_image_result(image_id: str, results: Dict, dir: str):
     with open(join(dir, image_id + ".json"), "w") as f:
         json.dump(results, f)
+
+
+def aggregate_results(dir: str):
+    results = {}
+    files = sorted(glob.glob(dir + "*.json"))
+    for file in files:
+        id = image_id(file)
+        results[id] = json.load(file)
+
+    return results
 
 
 def save_results(results: Dict, dir: str):
@@ -170,7 +191,7 @@ if __name__ == "__main__":
             msi_in_files,
             msi_out_files,
             config["method"],
-            config["wavelet"],
+            config["wavelet"].split(","),
             config["level"],
             config["metrics"].split(","),
             config["dir"],
