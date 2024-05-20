@@ -1,6 +1,8 @@
 from dwt.dwt import fuse_3dDWT
 import argparse
+import json
 from os.path import join, isdir
+from os import mkdir
 from tqdm import trange
 import glob
 from typing import Dict, List, Callable
@@ -28,15 +30,19 @@ def run_dwt(
     dir: str,
     transforms: Callable,
 ):
-    results = {}
 
-    results["method"] = method
-    results["wavelet"] = wavelet
-    results["level"] = level
-    results["dir"] = dir
+    if wavelet is str:
+        wavelet_str = wavelet
+    else:
+        wavelet_str = ""
+        for wav in wavelet:
+            wavelet_str += wav
+            wavelet_str += "-"
 
-    for metric in metrics:
-        results[metric] = {}
+    dir = dir + wavelet_str
+
+    print(dir)
+    # mkdir(dir)
 
     print(
         f"""
@@ -54,24 +60,23 @@ metric(s): {metrics} stored in {dir}
         rgb_in, msi_in, expected = transforms(rgb_in, msi_in, expected)
 
         result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, transforms)
+        id = image_id(rgb_in_files[i])
+
+        results = {}
 
         if "ssim" in metrics:
-            results["ssim"][image_id(rgb_in_files[i])] = metric_ssim(result, expected)
+            results["ssim"] = metric_ssim(result, expected)
         if "sam" in metrics:
-            results["sam"][image_id(rgb_in_files[i])] = metric_sam(result, expected)
+            results["sam"] = metric_sam(result, expected)
         if "psnr" in metrics:
-            results["psnr"][image_id(rgb_in_files[i])] = metric_psnr(result, expected)
+            results["psnr"] = metric_psnr(result, expected)
 
-    if "ssim" in results:
-        results["ssim"] = metric_join_ssim(results["ssim"])
-    if "sam" in results:
-        results["sam"] = metric_join_sam(results["sam"])
-    if "psnr" in results:
-        results["psnr"] = metric_join_psnr(results["psnr"])
+        save_image_result(id, results, dir)
 
-    save_results(results, dir)
 
-    return results
+def save_image_result(image_id: str, results: Dict, dir: str):
+    with open(join(dir, image_id + ".json"), "w") as f:
+        json.dump(results, f)
 
 
 def save_results(results: Dict, dir: str):
