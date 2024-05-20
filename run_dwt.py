@@ -48,16 +48,14 @@ def run_dwt(
 
     with open(join(dir, "method.txt"), "w") as f:
         f.write(
-            f"""
-Reading files from: {rgb_in_files[0].split("/")[-3]}
+            f"""Reading files from: {rgb_in_files[0].split("/")[-3]}
 dwt with wavelet(s): {wavelet}, level: {level}
 metric(s): {metrics} stored in {dir}
 """
         )
 
     print(
-        f"""
-Reading files from: {rgb_in_files[0].split("/")[-3]}
+        f"""Reading files from: {rgb_in_files[0].split("/")[-3]}
 dwt with wavelet(s): {wavelet}, level: {level}
 metric(s): {metrics} stored in {dir}
     """
