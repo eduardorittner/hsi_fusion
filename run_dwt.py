@@ -42,8 +42,14 @@ def run_dwt(
     dir = dir + wavelet_str
 
     if isdir(dir):
-        pass
+        n_files = len(glob.glob(join(dir, "*.npy")))
+        if n_files == len(rgb_in_files):
+            print("Results for this config have already been calculated.")
+            return
+        print("{n_files} have already been calculated, resuming")
+
     else:
+        n_files = 0
         mkdir(dir)
 
     with open(join(dir, "method.txt"), "w") as f:
@@ -61,7 +67,7 @@ metric(s): {metrics} stored in {dir}
     """
     )
 
-    for i in trange(len(rgb_in_files)):
+    for i in trange(n_files, len(rgb_in_files)):
         rgb_in = np.load(rgb_in_files[i])
         msi_in = np.load(msi_in_files[i])
         expected = np.load(msi_out_files[i])
