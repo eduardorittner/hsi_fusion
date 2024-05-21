@@ -2,7 +2,7 @@ from dwt.dwt import fuse_3dDWT
 import argparse
 from os.path import join, isdir
 from os import mkdir
-from tqdm import trange
+from tqdm import tqdm
 import glob
 from typing import Dict, List, Callable
 from transforms.get import get_transform
@@ -46,7 +46,7 @@ def run_dwt(
         if n_files == len(rgb_in_files):
             print("Results for this config have already been calculated.")
             return
-        print("{n_files} have already been calculated, resuming")
+        print(f"{n_files} have already been calculated, resuming")
 
     else:
         n_files = 0
@@ -67,7 +67,7 @@ metric(s): {metrics} stored in {dir}
     """
     )
 
-    for i in trange(n_files, len(rgb_in_files)):
+    for i in tqdm(range(n_files, len(rgb_in_files))):
         rgb_in = np.load(rgb_in_files[i])
         msi_in = np.load(msi_in_files[i])
         expected = np.load(msi_out_files[i])
