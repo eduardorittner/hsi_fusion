@@ -145,13 +145,6 @@ def run_dwt_suite(dir: str):
             get_transform(config["transforms"]),
         )
         print("Results calculated:")
-        if "ssim" in results.keys():
-            print(f"SSIM: {results['ssim'][0]}")
-        if "sam" in results.keys():
-            print(f"sam: {results['sam']}")
-        if "psnr" in results.keys():
-            print(f"psnr: {results['psnr']}")
-        print("------------------")
 
 
 if __name__ == "__main__":
