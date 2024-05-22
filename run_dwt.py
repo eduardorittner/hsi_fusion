@@ -177,7 +177,7 @@ def run_dwt_suite(dir: str):
             msi_in_files,
             msi_out_files,
             config["method"],
-            config["wavelet"],
+            config["wavelet"].split(","),
             config["level"],
             config["metrics"].split(","),
             config["dir"],
