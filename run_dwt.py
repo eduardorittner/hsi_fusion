@@ -130,7 +130,7 @@ def calculate_deviation(dir: str, metrics: List[str], results: Dict):
         if deviation is None:
             deviation = {}
             for metric in metrics:
-                deviation[metric] = np.array(r[metric].shape)
+                deviation[metric] = np.array((r[metric].shape))
                 deviation[metric] = (r[metric] - results[metric]) ** 2
         else:
             for metric in metrics:
