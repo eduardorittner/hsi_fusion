@@ -93,6 +93,48 @@ def save_image_result(image_id: str, results: Dict, dir: str):
     np.save(join(dir, image_id), np.array(results))
 
 
+def calculate_mean(dir: str, metrics: List[str]) -> Dict:
+    files = sorted(glob.glob(dir + "*.npy"))
+    results = None
+
+    for file in files:
+        r = np.load(file)
+        if results is None:
+            results = {}
+            for metric in metrics:
+                results[metric] = r[metric]
+        else:
+            for metric in metrics:
+                results[metric] += r[metric]
+
+    for metric in metrics:
+        results[metric] /= len(files)
+
+    return results
+
+
+def calculate_deviation(dir: str, results: Dict):
+    files = sorted(glob.glob(dir + "*.npy"))
+    deviation = None
+
+    for file in files:
+        r = np.load(file)
+        if deviation is None:
+            deviation = {}
+            for metric in metrics:
+                deviation[metric] = np.array(r[metric].shape)
+                deviation[metric] = (r[metric] - results[metric]) ** 2
+        else:
+            for metric in metrics:
+                deviation[metric] += (r[metric] - results[metric]) ** 2
+
+    for metric in metrics:
+        deviation[metric] /= len(files)
+        deviation[metric] = np.sqrt(deviation[metric])
+
+    return results
+
+
 def save_results(results: Dict, dir: str):
     date = datetime.today().strftime("%Y-%m-%d-%s")
     with open(join(dir, "results" + date + ".txt"), "w") as f:
@@ -120,9 +162,6 @@ Level: {results['level']}
             f.write("PSNR\n")
             f.write(f"{results['psnr']}\n")
             f.write("-----------------------")
-
-
-# def recover_dwt(dir: str):
 
 
 def run_dwt_suite(dir: str):
@@ -161,8 +200,17 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--metrics", type=str, help="Which metrics to compute")
     parser.add_argument("-c", "--config", type=str, help="Path to config")
     parser.add_argument("-s", "--suite", type=str, help="Path to configs")
+    parser.add_argument("-r", "--results", type=str, help="Calculate results")
 
     args = parser.parse_args()
+
+    if args.results is not None:
+        mean = calculate_mean(args.dir, args.metrics)
+        deviation = calculate_deviation(args.dir, args.mean)
+        np.save(join(dir, "mean"), mean)
+        np.save(join(dir, "deviation"), deviation)
+        print(r"results saved in {dir}")
+        exit(0)
 
     if args.suite is not None:
         run_dwt_suite(args.suite)
