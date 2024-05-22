@@ -90,7 +90,8 @@ metric(s): {metrics} stored in {dir}
 
 
 def save_image_result(image_id: str, results: Dict, dir: str):
-    np.save(join(dir, image_id), np.array(results))
+    image_path = join(dir, image_id)
+    np.save(image_path, np.array(results))
 
 
 def access_metrics(r) -> Dict:
