@@ -214,7 +214,7 @@ if __name__ == "__main__":
 
     if args.results is not None:
         mean = calculate_mean(args.results, args.metrics.split(","))
-        deviation = calculate_deviation(args.results, args.mean)
+        deviation = calculate_deviation(args.results, args.metrics, mean)
         np.save(join(dir, "mean"), mean)
         np.save(join(dir, "deviation"), deviation)
         print(r"results saved in {dir}")
