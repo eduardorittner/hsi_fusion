@@ -93,12 +93,22 @@ def save_image_result(image_id: str, results: Dict, dir: str):
     np.save(join(dir, image_id), np.array(results))
 
 
+def access_metrics(r, metrics: List[str]) -> Dict:
+    # This is necessary to access a np array of type object
+    result = {}
+    for metric in metrics:
+        result[metric] = r[metric]
+
+    return result
+
+
 def calculate_mean(dir: str, metrics: List[str]) -> Dict:
     files = sorted(glob.glob(dir + "*.npy"))
     results = None
 
     for file in files:
-        r = np.load(file)
+        r = np.load(file, allow_pickle=True)
+        r = np.vectorize(access_metrics)(r, metrics)
         if results is None:
             results = {}
             for metric in metrics:
@@ -113,12 +123,13 @@ def calculate_mean(dir: str, metrics: List[str]) -> Dict:
     return results
 
 
-def calculate_deviation(dir: str, results: Dict):
+def calculate_deviation(dir: str, metrics: List[str], results: Dict):
     files = sorted(glob.glob(dir + "*.npy"))
     deviation = None
 
     for file in files:
-        r = np.load(file)
+        r = np.load(file, allow_pickle=True)
+        r = np.vectorize(access_metrics)(r, metrics)
         if deviation is None:
             deviation = {}
             for metric in metrics:
@@ -205,8 +216,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.results is not None:
-        mean = calculate_mean(args.dir, args.metrics)
-        deviation = calculate_deviation(args.dir, args.mean)
+        mean = calculate_mean(args.results, args.metrics.split(","))
+        deviation = calculate_deviation(args.results, args.mean)
         np.save(join(dir, "mean"), mean)
         np.save(join(dir, "deviation"), deviation)
         print(r"results saved in {dir}")
