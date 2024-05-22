@@ -93,13 +93,10 @@ def save_image_result(image_id: str, results: Dict, dir: str):
     np.save(join(dir, image_id), np.array(results))
 
 
-def access_metrics(r, metrics: List[str]) -> Dict:
+def access_metrics(r) -> Dict:
     # This is necessary to access a np array of type object
-    result = {}
-    for metric in metrics:
-        result[metric] = r[metric]
 
-    return result
+    return r["ssim"], r["sam"], r["psnr"]
 
 
 def calculate_mean(dir: str, metrics: List[str]) -> Dict:
@@ -107,8 +104,8 @@ def calculate_mean(dir: str, metrics: List[str]) -> Dict:
     results = None
 
     for file in files:
-        r = np.load(file, allow_pickle=True)
-        r = np.vectorize(access_metrics)(r, metrics)
+        r = np.vectorize(access_metrics)(np.load(file, allow_pickle=True))
+        r = {"ssim": r[0], "sam": r[1], "psnr": r[2]}
         if results is None:
             results = {}
             for metric in metrics:
@@ -128,8 +125,8 @@ def calculate_deviation(dir: str, metrics: List[str], results: Dict):
     deviation = None
 
     for file in files:
-        r = np.load(file, allow_pickle=True)
-        r = np.vectorize(access_metrics)(r, metrics)
+        r = np.vectorize(access_metrics)(np.load(file, allow_pickle=True))
+        r = {"ssim": r[0], "sam": r[1], "psnr": r[2]}
         if deviation is None:
             deviation = {}
             for metric in metrics:
