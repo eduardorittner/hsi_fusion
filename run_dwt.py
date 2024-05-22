@@ -220,7 +220,7 @@ if __name__ == "__main__":
         deviation_path = join(args.results, "deviation")
         np.save(mean_path, mean)
         np.save(deviation_path, deviation)
-        print(r"results saved in {dir}")
+        print(f"results saved in {dir}")
         exit(0)
 
     if args.suite is not None:
