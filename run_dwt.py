@@ -195,6 +195,16 @@ def run_dwt_suite(dir: str):
         print("Results calculated:")
 
 
+def save_results_to_file(mean: Dict, deviation: Dict, dir: str):
+    with open(join(dir, "results.txt")) as f:
+        for metric in mean.keys():
+            f.write(f"Metric: {metric}\n")
+            for a, b in zip(mean[metric], deviation[metric]):
+                f.write(f"{a} +- {b}")
+
+            f.write("\n")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="fusion-runner",
@@ -218,8 +228,7 @@ if __name__ == "__main__":
         deviation = calculate_deviation(args.results, args.metrics.split(","), mean)
         mean_path = join(args.results, "mean")
         deviation_path = join(args.results, "deviation")
-        np.save(mean_path, mean)
-        np.save(deviation_path, deviation)
+        save_results_to_file(mean, deviation, args.results)
         print(f"results saved in {args.results}")
         exit(0)
 
