@@ -199,7 +199,10 @@ def save_results_to_file(mean: Dict, deviation: Dict, dir: str):
     with open(join(dir, "results.txt"), "w") as f:
         for metric in mean.keys():
             f.write(f"Metric: {metric}\n")
-            for a, b in zip(mean[metric], deviation[metric]):
+            if len(mean[metric]) > 1:
+                for a, b in zip(mean[metric], deviation[metric]):
+                    f.write(f"{a} +- {b}")
+            else:
                 f.write(f"{a} +- {b}")
 
             f.write("\n")
