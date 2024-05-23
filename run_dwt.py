@@ -203,7 +203,7 @@ def save_results_to_file(mean: Dict, deviation: Dict, dir: str):
                 for a, b in zip(mean[metric], deviation[metric]):
                     f.write(f"{a} +- {b}\n")
             else:
-                f.write(f"{a} +- {b}\n")
+                f.write(f"{mean[metric]} +- {deviation[metric]}\n")
 
             f.write("\n")
 
