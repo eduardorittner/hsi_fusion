@@ -1,6 +1,6 @@
 from dwt.dwt import fuse_3dDWT
 import argparse
-from os.path import join, isdir
+from os.path import join, isdir, isfile
 from os import mkdir
 from tqdm import tqdm
 import glob
@@ -214,9 +214,11 @@ def aggregate_results(dir: str):
 
     for folder in folders:
         wav = folder.split("/")[-1]
-        with open(join(folder, "results.txt"), "r") as f:
-            file = f.readlines()
-            results[wav] = {"ssim": file[1], "sam": file[65], "psnr": file[68]}
+        filename = join(folder, "results.txt")
+        if isfile(filename):
+            with open(filename, "results.txt"), "r") as f:
+                file = f.readlines()
+                results[wav] = {"ssim": file[1], "sam": file[65], "psnr": file[68]}
 
     with open(join(dir, "results.txt"), "w") as f:
         f.write(f"{results}\n")
