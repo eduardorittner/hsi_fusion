@@ -1,7 +1,6 @@
 import pywt
 import numpy as np
 from typing import List, Callable
-import pywt
 
 
 class DWT_coeffs(object):

@@ -1,4 +1,5 @@
 from dwt.dwt import fuse_3dDWT
+from dwt.average import fuse_average
 import argparse
 from os.path import join, isdir, isfile
 from os import mkdir
@@ -27,7 +28,7 @@ def run_dwt(
     level: int,
     metrics: List[str],
     dir: str,
-    transforms: Callable,
+    transforms: List[Callable],
 ):
 
     if isinstance(wavelet, str):
@@ -74,7 +75,11 @@ metric(s): {metrics} stored in {dir}
 
         rgb_in, msi_in, expected = transforms(rgb_in, msi_in, expected)
 
-        result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, transforms)
+        if method == "3d-dwt":
+            result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, transforms)
+        elif method == "average":
+            result = fuse_average(rgb_in, msi_in, transforms)
+
         id = image_id(rgb_in_files[i])
 
         results = {}
