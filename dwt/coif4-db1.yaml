@@ -1,0 +1,12 @@
+rgb_in_files: "/home/eduardo/data/rgb_in/"
+msi_in_files: "/home/eduardo/data/msi_in/"
+msi_out_files: "/home/eduardo/data/msi_out/"
+
+method: "3d-dwt"
+wavelet: "coif4,db1,db1"
+level: 2
+metrics: "ssim,sam,psnr"
+
+dir: "/home/eduardo/results/"
+
+transforms: "1024x61_1024x61"

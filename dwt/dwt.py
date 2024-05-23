@@ -102,12 +102,28 @@ def fuse_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarray):
     return
 
 
+def fuse_2dDWT(
+    rgb_in: np.ndarray,
+    msi_in: np.ndarray,
+    wavelet: type[str | List[str]],
+    level: int,
+    transform: Callable,
+) -> np.ndarray:
+    if transform is not None:
+        rgb_in, msi_in, _ = transform(rgb_in, msi_in, None)
+
+    rgb_coeffs = DWT_coeffs(rgb_in, wavelet, level)
+    msi_coeffs = DWT_coeffs(msi_in, wavelet, level)
+
+    return
+
+
 def fuse_3dDWT(
     rgb_in: np.ndarray,
     msi_in: np.ndarray,
     wavelet: type[str | List[str]],
     level: int,
-    transform: List[Callable],
+    transform: Callable,
 ) -> np.ndarray:
 
     if transform is not None:
