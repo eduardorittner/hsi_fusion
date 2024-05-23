@@ -221,6 +221,8 @@ def aggregate_results(dir: str):
     with open(join(dir, "results.txt"), "w") as f:
         f.write(f"{results}\n")
 
+    print(f"Saving results in {join(dir, 'results.txt')}")
+
 
 
 if __name__ == "__main__":
@@ -244,6 +246,7 @@ if __name__ == "__main__":
 
     if args.aggregate is not None:
         dir = args.aggregate
+        aggregate_results(dir)
         exit(0)
 
     if args.results is not None:
