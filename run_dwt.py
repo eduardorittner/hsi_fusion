@@ -209,7 +209,7 @@ def save_results_to_file(mean: Dict, deviation: Dict, dir: str):
 
 
 def aggregate_results(dir: str):
-    folders = sorted(glob.glob(dir))
+    folders = sorted(glob.glob(join(dir, "*")))
     results = {}
 
     for folder in folders:
