@@ -1,4 +1,4 @@
-from dwt.dwt import fuse_3dDWT
+from dwt.dwt import fuse_3dDWT, fuse_2dDWT
 from dwt.average import fuse_average
 import argparse
 from os.path import join, isdir, isfile
@@ -94,7 +94,7 @@ metric(s): {metrics} stored in {dir}
             result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, transforms)
 
         elif method == "2d-dwt":
-            result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, transforms)
+            result = fuse_2dDWT(rgb_in, msi_in, wavelet, level, transforms)
 
         elif method == "average":
             result = fuse_average(rgb_in, msi_in, transforms)
