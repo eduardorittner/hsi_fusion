@@ -208,6 +208,21 @@ def save_results_to_file(mean: Dict, deviation: Dict, dir: str):
             f.write("\n")
 
 
+def aggregate_results(dir: str):
+    folders = sorted(glob.glob(dir))
+    results = {}
+
+    for folder in folders:
+        wav = folder.split("/")[-1]
+        with open(join(folder, "results.txt"), "r") as f:
+            file = f.readlines()
+            results[wav] = {"ssim": file[1], "sam": file[65], "psnr": file[68]}
+
+    with open(join(dir, "results.txt"), "w") as f:
+        f.write(f"{results}\n")
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="fusion-runner",
@@ -223,8 +238,13 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--config", type=str, help="Path to config")
     parser.add_argument("-s", "--suite", type=str, help="Path to configs")
     parser.add_argument("-r", "--results", type=str, help="Calculate results")
+    parser.add_argument("-a", "--aggregate", type=str, help="Aggregate results")
 
     args = parser.parse_args()
+
+    if args.aggregate is not None:
+        dir = args.aggregate
+        exit(0)
 
     if args.results is not None:
         mean = calculate_mean(args.results, args.metrics.split(","))
