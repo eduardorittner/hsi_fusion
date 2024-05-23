@@ -196,7 +196,7 @@ def run_dwt_suite(dir: str):
 
 
 def save_results_to_file(mean: Dict, deviation: Dict, dir: str):
-    with open(join(dir, "results.txt")) as f:
+    with open(join(dir, "results.txt"), "w") as f:
         for metric in mean.keys():
             f.write(f"Metric: {metric}\n")
             for a, b in zip(mean[metric], deviation[metric]):
