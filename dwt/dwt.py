@@ -46,8 +46,10 @@ def fuse_approx_2d(rgb_in: DWT2D_coeffs, msi_in: DWT2D_coeffs, fused: np.ndarray
 
 def fuse_detail_2d(rgb_in: DWT2D_coeffs, msi_in: DWT2D_coeffs, fused: np.ndarray):
     rgb = rgb_in.coeffs_detail()
-    start, stop = rgb[1].start, rgb[1].stop
-    fused[start:stop] = rgb[start:stop]
+
+    for level in rgb:
+        start, stop = level[1].start, level[1].stop
+        fused[start:stop] = level[0][start:stop]
 
 
 class DWT_coeffs(object):
