@@ -105,8 +105,8 @@ def calculate_mean(dir: str, metrics: List[str]) -> Dict:
     results = None
 
     for file in files:
-        r = np.vectorize(access_metrics)(np.load(file, allow_pickle=True))
-        r = {"ssim": r[0], "sam": r[1], "psnr": r[2]}
+        ssim, sam, psnr = np.vectorize(access_metrics)(np.load(file, allow_pickle=True))
+        r = {"ssim": ssim, "sam": sam, "psnr": psnr}
         if results is None:
             results = {}
             for metric in metrics:
@@ -126,8 +126,8 @@ def calculate_deviation(dir: str, metrics: List[str], results: Dict):
     deviation = None
 
     for file in files:
-        r = np.vectorize(access_metrics)(np.load(file, allow_pickle=True))
-        r = {"ssim": r[0], "sam": r[1], "psnr": r[2]}
+        ssim, sam, psnr = np.vectorize(access_metrics)(np.load(file, allow_pickle=True))
+        r = {"ssim": ssim, "sam": sam, "psnr": psnr}
         if deviation is None:
             deviation = {}
             for metric in metrics:

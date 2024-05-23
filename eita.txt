@@ -1,0 +1,13 @@
+Method: 3D-dwt
+Wavelet: db1
+Level: 1
+-----------
+SSIM
+Average:
+Band 0:
+...
+Band 61:
+---------
+SAM
+--------
+PSNR

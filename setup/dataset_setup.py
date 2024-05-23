@@ -33,13 +33,11 @@ def save2np(file, dest_path):
         for key in tqdm(keys):
             arr = f[key][()]
             rgb_in = arr[:4].T
-            msi_out_vis = arr[4 : 4 + 31]
-            msi_out_nir = arr[
-                31 + 4 + 1 :
-            ]  # Skip 35th band since it's a duplicate of 36
+            msi_out_vis = arr[4:35]
+            msi_out_nir = arr[36:]  # Skip 35th band since it's a duplicate of 36
             msi_out = np.concatenate((msi_out_vis, msi_out_nir), axis=0).T
 
-            msi_in = msi_out[:: 4, ::4, :]
+            msi_in = msi_out[::4, ::4, :]
 
             np.save(path.join(rgb_in_path, key), rgb_in)
             np.save(path.join(msi_in_path, key), msi_in)
