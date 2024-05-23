@@ -163,7 +163,7 @@ def fuse_2dDWT(
     if transform is not None:
         rgb_in, msi_in, _ = transform(rgb_in, msi_in, None)
 
-    results = np.array(rgb_in.shape)
+    results = np.zeros(rgb_in.shape)
 
     for band in range(rgb_in.shape[2]):
         rgb_coeffs = DWT2D_coeffs(rgb_in[:, :, band], wavelet, level)
@@ -181,7 +181,7 @@ def fuse_2dDWT(
                 output_format="wavedec2",
             ),
             wavelet=wavelet,
-        )
+        )[:, :]
 
     return results
 
