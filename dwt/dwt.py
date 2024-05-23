@@ -49,7 +49,7 @@ def fuse_detail_2d(rgb_in: DWT2D_coeffs, msi_in: DWT2D_coeffs, fused: np.ndarray
 
     for level in rgb:
         start, stop = level[1].start, level[1].stop
-        fused[start:stop] = level[0][start:stop]
+        fused[start:stop] = level[0][stop - start]
 
 
 class DWT_coeffs(object):
@@ -144,9 +144,11 @@ def fuse_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarray):
     rgb = rgb_in.coeffs_detail_both()
     msi = msi_in.coeffs_detail_both()
 
-    for level in rgb:
-        start, stop = level[1].start, level[1].stop
-        fused[start:stop] = (level[0][: stop - start] + level[0][: stop - start]) / 2
+    for rgb_subband, msi_subband in zip(rgb, msi):
+        start, stop = rgb_subband[1].start, rgb_subband[1].stop
+        fused[start:stop] = (
+            rgb_subband[0][: stop - start] + msi_subband[0][: stop - start]
+        ) / 2
 
     return
 
@@ -172,7 +174,12 @@ def fuse_2dDWT(
         fuse_detail_2d(rgb_coeffs, msi_coeffs, fused_coeffs)
 
         results[:, :, band] = pywt.waverec2(
-            pywt.unravel_coeffs(fused_coeffs, rgb_coeffs.slices, rgb_coeffs.shapes),
+            pywt.unravel_coeffs(
+                fused_coeffs,
+                rgb_coeffs.slices,
+                rgb_coeffs.shapes,
+                output_format="wavedec2",
+            ),
             wavelet=wavelet,
         )
 
