@@ -31,16 +31,31 @@ def run_dwt(
     transforms: List[Callable],
 ):
 
-    if isinstance(wavelet, str):
-        wavelet_str = wavelet
-    else:
-        wavelet_str = ""
-        for wav in wavelet:
-            wavelet_str += wav
-            wavelet_str += "-"
-        wavelet_str = wavelet_str[:-1]
+    dir_str = ""
 
-    dir = dir + wavelet_str
+    if method == "3d-dwt":
+        if isinstance(wavelet, str):
+            dir_str = wavelet
+        else:
+            for wav in wavelet:
+                dir_str += wav
+                dir_str += "-"
+            dir_str = dir_str[:-1]
+
+    elif method == "average":
+        dir_str = "average"
+
+    elif method == "2d-dwt":
+        dir_str = "2d"
+        if isinstance(wavelet, str):
+            dir_str += wavelet
+        else:
+            for wav in wavelet:
+                dir_str += wav
+                dir_str += "-"
+            dir_str = dir_str[:-1]
+
+    dir = dir + dir_str
 
     if isdir(dir):
         n_files = len(glob.glob(join(dir, "*.npy")))
@@ -77,6 +92,10 @@ metric(s): {metrics} stored in {dir}
 
         if method == "3d-dwt":
             result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, transforms)
+
+        elif method == "2d-dwt":
+            result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, transforms)
+
         elif method == "average":
             result = fuse_average(rgb_in, msi_in, transforms)
 
@@ -321,23 +340,23 @@ if __name__ == "__main__":
 
         transforms = Compose([Resolution(1024, 1024), Bands(61, 61, None)])
 
-    results = run_dwt(
-        rgb_in_files,
-        msi_in_files,
-        msi_out_files,
-        method,
-        wavelet,
-        level,
-        metrics,
-        dir,
-        transforms,
-    )
+        results = run_dwt(
+            rgb_in_files,
+            msi_in_files,
+            msi_out_files,
+            method,
+            wavelet,
+            level,
+            metrics,
+            dir,
+            transforms,
+        )
 
-    print("Results calculated:")
-    if "ssim" in results.keys():
-        print(f"SSIM: {results['ssim'][0]}")
-    if "sam" in results.keys():
-        print(f"sam: {results['sam']}")
-    if "psnr" in results.keys():
-        print(f"psnr: {results['psnr']}")
-    print("------------------")
+        print("Results calculated:")
+        if "ssim" in results.keys():
+            print(f"SSIM: {results['ssim'][0]}")
+        if "sam" in results.keys():
+            print(f"sam: {results['sam']}")
+        if "psnr" in results.keys():
+            print(f"psnr: {results['psnr']}")
+        print("------------------")
