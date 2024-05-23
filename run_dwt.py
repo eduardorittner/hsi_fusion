@@ -141,7 +141,7 @@ def calculate_deviation(dir: str, metrics: List[str], results: Dict):
         deviation[metric] /= len(files)
         deviation[metric] = np.sqrt(deviation[metric])
 
-    return results
+    return deviation
 
 
 def save_results(results: Dict, dir: str):
@@ -199,11 +199,11 @@ def save_results_to_file(mean: Dict, deviation: Dict, dir: str):
     with open(join(dir, "results.txt"), "w") as f:
         for metric in mean.keys():
             f.write(f"Metric: {metric}\n")
-            if len(mean[metric]) > 1:
+            if mean[metric].shape:
                 for a, b in zip(mean[metric], deviation[metric]):
-                    f.write(f"{a} +- {b}")
+                    f.write(f"{a} +- {b}\n")
             else:
-                f.write(f"{a} +- {b}")
+                f.write(f"{a} +- {b}\n")
 
             f.write("\n")
 
