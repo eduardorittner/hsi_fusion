@@ -221,7 +221,9 @@ def aggregate_results(dir: str):
                 results[wav] = {"ssim": file[1], "sam": file[65], "psnr": file[68]}
 
     with open(join(dir, "results.txt"), "w") as f:
-        f.write(f"{results}\n")
+        for key, value in results.items():
+            f.write(f"{key}\n")
+            f.write(f"{value}\n")
 
     print(f"Saving results in {join(dir, 'results.txt')}")
 
