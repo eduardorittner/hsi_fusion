@@ -216,7 +216,7 @@ def aggregate_results(dir: str):
         wav = folder.split("/")[-1]
         filename = join(folder, "results.txt")
         if isfile(filename):
-            with open(filename, "results.txt"), "r") as f:
+            with open(filename, "r") as f:
                 file = f.readlines()
                 results[wav] = {"ssim": file[1], "sam": file[65], "psnr": file[68]}
 
