@@ -8,7 +8,7 @@ class DWT2D_coeffs(object):
         self.wavelet = wavelet
         self.level = level
         self.coeffs, self.slices, self.shapes = pywt.ravel_coeffs(
-            pywt.wavedecn(image, wavelet=wavelet, level=level)
+            pywt.wavedec2(image, wavelet=wavelet, level=level)
         )
         self.coeffs = np.array(self.coeffs)
 
