@@ -49,7 +49,7 @@ def fuse_detail_2d(rgb_in: DWT2D_coeffs, msi_in: DWT2D_coeffs, fused: np.ndarray
 
     for level in rgb:
         start, stop = level[1].start, level[1].stop
-        fused[start:stop] = level[0][stop - start]
+        fused[start:stop] = level[0][: stop - start]
 
 
 class DWT_coeffs(object):
