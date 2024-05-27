@@ -72,7 +72,7 @@ class DWT_coeffs(object):
 
         for i in range(self.level):
             results.append(
-                (self.coeffs[self.slices[i + 1]["aad"]], self.slices[i + 1]["aad"])
+                (self.coeffs[self.slices[i + 1]["daa"]], self.slices[i + 1]["daa"])
             )
 
         return results
@@ -85,10 +85,10 @@ class DWT_coeffs(object):
                 (self.coeffs[self.slices[i + 1]["ada"]], self.slices[i + 1]["ada"])
             )
             results.append(
-                (self.coeffs[self.slices[i + 1]["daa"]], self.slices[i + 1]["daa"])
+                (self.coeffs[self.slices[i + 1]["aad"]], self.slices[i + 1]["aad"])
             )
             results.append(
-                (self.coeffs[self.slices[i + 1]["dda"]], self.slices[i + 1]["dda"])
+                (self.coeffs[self.slices[i + 1]["add"]], self.slices[i + 1]["add"])
             )
 
         return results
@@ -98,7 +98,7 @@ class DWT_coeffs(object):
 
         for i in range(self.level):
             results.append(
-                (self.coeffs[self.slices[i + 1]["add"]], self.slices[i + 1]["add"])
+                (self.coeffs[self.slices[i + 1]["dda"]], self.slices[i + 1]["dda"])
             )
             results.append(
                 (self.coeffs[self.slices[i + 1]["dad"]], self.slices[i + 1]["dad"])
