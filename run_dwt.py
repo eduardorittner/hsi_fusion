@@ -201,7 +201,7 @@ def run_dwt_suite(dir: str):
     config_files = sorted(glob.glob(join(dir, "*.yaml")))
     for file in config_files:
         config = read_yaml(file, False)
-        if config["run"] is None or config["run"] != "true":
+        if config.get("run") is None or config["run"] != "true":
             print(f"{file} is not set to run. Moving on to next one")
             continue
 
