@@ -1,3 +1,4 @@
+run: "true"
 rgb_in_files: "/home/eduardo/data/rgb_in/"
 msi_in_files: "/home/eduardo/data/msi_in/"
 msi_out_files: "/home/eduardo/data/msi_out/"
