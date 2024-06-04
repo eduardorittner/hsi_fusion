@@ -201,11 +201,15 @@ def run_dwt_suite(dir: str):
     config_files = sorted(glob.glob(join(dir, "*.yaml")))
     for file in config_files:
         config = read_yaml(file, False)
+        if config["run"] is None or config["run"] != "true":
+            print(f"{file} is not set to run. Moving on to next one")
+            continue
+
         print(f"Running {file}")
         rgb_in_files = sorted(glob.glob(join(config["rgb_in_files"], "*.npy")))
         msi_in_files = sorted(glob.glob(join(config["msi_in_files"], "*.npy")))
         msi_out_files = sorted(glob.glob(join(config["msi_out_files"], "*.npy")))
-        results = run_dwt(
+        run_dwt(
             rgb_in_files,
             msi_in_files,
             msi_out_files,
@@ -250,7 +254,6 @@ def aggregate_results(dir: str):
             f.write(f"{value}\n")
 
     print(f"Saving results in {join(dir, 'results.txt')}")
-
 
 
 if __name__ == "__main__":
