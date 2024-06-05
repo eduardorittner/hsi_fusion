@@ -25,21 +25,21 @@ class IcasspDataModule(LightningDataModule):
         train_preprocessing = None  # Do we really need preprocessing?
 
         self.train = IcasspDataset(
-            path.join(base_path, "train"),
+            base_path,
             train_split,
             train_transform,
             train_preprocessing,
         )
 
         self.val = IcasspDataset(
-            path.join(base_path, "val"),
+            base_path,
             val_split,
             train_transform,
             train_preprocessing,
         )
 
         self.test = IcasspDataset(
-            path.join(base_path, "test"),
+            base_path,
             test_split,
             train_transform,
             train_preprocessing,
@@ -115,7 +115,7 @@ class IcasspDataset(Dataset):
         self.coeffs_out: List[str] = sorted(
             [
                 i
-                for i in glob(path.join(self.base_path, "coeffs_out", fmt))
+                for i in glob(path.join(self.base_path, "coeffs", fmt))
                 if any(name in i for name in names)
             ]
         )
@@ -130,7 +130,7 @@ class IcasspDataset(Dataset):
 
         assert (
             dir_lens_match
-        ), f"One of the 3 directories does not contain {self.total_files} files"
+            ), f"One of the 3 directories does not contain {self.total_files} files: msi_in - {len(self.msi_in)}, hsi_in - {len(self.hsi_in)}, coeffs_out - {len(self.coeffs_out)}"
 
         print(self.init_str())
 

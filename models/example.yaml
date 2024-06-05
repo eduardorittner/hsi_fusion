@@ -1,4 +1,4 @@
-data_path: "~/data/"
+data_path: "/home/eduardo/data/"
 
 transform: "512x512"
 
