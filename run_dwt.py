@@ -55,6 +55,12 @@ def run_dwt(
                 dir_str += "-"
             dir_str = dir_str[:-1]
 
+    elif method == "baseline-msi":
+        dir_str = "baseline-msi"
+
+    elif method == "baseline-hsi":
+        dir_str = "baseline-hsi"
+
     dir = dir + dir_str
 
     if isdir(dir):
@@ -91,13 +97,19 @@ metric(s): {metrics} stored in {dir}
         rgb_in, msi_in, expected = transforms(rgb_in, msi_in, expected)
 
         if method == "3d-dwt":
-            result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, transforms)
+            result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, None)
 
         elif method == "2d-dwt":
-            result = fuse_2dDWT(rgb_in, msi_in, wavelet, level, transforms)
+            result = fuse_2dDWT(rgb_in, msi_in, wavelet, level, None)
 
         elif method == "average":
-            result = fuse_average(rgb_in, msi_in, transforms)
+            result = fuse_average(rgb_in, msi_in, None)
+
+        elif method == "baseline-msi":
+            result = rgb_in
+
+        elif method == "baseline-msi":
+            result = msi_in
 
         id = image_id(rgb_in_files[i])
 

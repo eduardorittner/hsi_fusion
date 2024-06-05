@@ -18,6 +18,9 @@ class IcasspDataModule(LightningDataModule):
     def setup(self, stage=None):
         base_path = self.hparams.data_path
 
+        train_split = self.hparams.train_split
+        val_split = self.hparams.val_split
+        test_split = self.hparams.test_split
         train_transform = get_transform(self.hparams.transform)
         train_preprocessing = None  # Do we really need preprocessing?
         res = self.hparams.res
@@ -25,6 +28,7 @@ class IcasspDataModule(LightningDataModule):
 
         self.train = IcasspDataset(
             path.join(base_path, "train"),
+            train_split,
             train_transform,
             train_preprocessing,
             res,
@@ -33,6 +37,7 @@ class IcasspDataModule(LightningDataModule):
 
         self.val = IcasspDataset(
             path.join(base_path, "val"),
+            val_split,
             train_transform,
             train_preprocessing,
             res,
@@ -41,6 +46,7 @@ class IcasspDataModule(LightningDataModule):
 
         self.test = IcasspDataset(
             path.join(base_path, "test"),
+            test_split,
             train_transform,
             train_preprocessing,
             res,
@@ -73,6 +79,7 @@ class IcasspDataset(Dataset):
     def __init__(
         self,
         base_path: str,
+        names: List[str],
         transform: Optional[Callable] = None,
         preprocessing: Optional[str] = None,
         fold: Optional[int] = None,
@@ -86,11 +93,10 @@ class IcasspDataset(Dataset):
             print(f"WARNING: Ignoring dataset argument {k}: {v}")
 
         self.base_path = base_path
+        self.names = names
         self.transform = transform
         self.preprocessing = preprocessing
         self.fold = fold
-        self.res = res
-        self.bands = bands
 
         if self.preprocessing is None:
             fmt = "*.npy"
@@ -102,17 +108,33 @@ class IcasspDataset(Dataset):
         self.fmt = fmt
         self.is_coefficient = is_coefficient
 
-        self.msi_in: List[str] = sorted(
-            glob(path.join(self.base_path, "downsampled", fmt))
+        self.hsi_in: List[str] = sorted(
+            [
+                i
+                for i in glob(path.join(self.base_path, "hsi_in", fmt))
+                if any(name in i for name in names)
+            ]
         )
-        self.rgb_in: List[str] = sorted(glob(path.join(self.base_path, "rgb-nir", fmt)))
-        self.msi_out: List[str] = sorted(glob(path.join(self.base_path, "msi", fmt)))
-        self.total_files = len(self.msi_in)
+        self.msi_in: List[str] = sorted(
+            [
+                i
+                for i in glob(path.join(self.base_path, "msi_in", fmt))
+                if any(name in i for name in names)
+            ]
+        )
+        self.coeffs_out: List[str] = sorted(
+            [
+                i
+                for i in glob(path.join(self.base_path, "coeffs_out", fmt))
+                if any(name in i for name in names)
+            ]
+        )
+        self.total_files = len(self.hsi_in)
 
         dir_lens_match = (
-            len(self.msi_in)
-            == len(self.rgb_in)
-            == len(self.msi_out)
+            len(self.hsi_in)
+            == len(self.msi_in)
+            == len(self.coeffs_out)
             == self.total_files
         )
 
@@ -129,36 +151,33 @@ class IcasspDataset(Dataset):
         return self.total_files
 
     def load_image(
-        self, msi_in_path: str, rgb_in_path: str, msi_out_path: str
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        # TODO: Use self.res and self.bands variables to load image correctly
+        self, hsi_in_path: str, msi_in_path: str, coeffs_out_path: str
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
+        hsi_in = np.load(hsi_in_path)
         msi_in = np.load(msi_in_path)
-        rgb_in = np.load(rgb_in_path)
-        msi_out = np.load(msi_out_path)
+        coeffs_out = np.load(coeffs_out_path)
 
-        return rgb_in, msi_in, msi_out
+        return msi_in, hsi_in, coeffs_out
 
-    def __getitem__(self, idx: int) -> Tuple[np.ndarray, np.ndarray]:
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         """
-        Returns (msi_in[1024,1024,61] + rgb_in[1024,1024,61]) + (msi_out[1024,1024,61])
+        Returns (hsi_in[1024,1024,61] + msi_in[1024,1024,61]) + (coeffs_out[1024,1024,61])
         Resulting size is [122,1024,1024]
         """
 
-        rgb_in, msi_in, msi_out = self.load_image(
-            self.msi_in[idx], self.rgb_in[idx], self.msi_out[idx]
+        msi_in, hsi_in, coeffs_out = self.load_image(
+            self.hsi_in[idx], self.msi_in[idx], self.coeffs_out[idx]
         )
 
+        msi_in = torch.from_numpy(msi_in)
+        hsi_in = torch.from_numpy(hsi_in)
+        coeffs_out = torch.from_numpy(coeffs_out)
+
         if self.transform is not None:
-            rgb_in, msi_in, msi_out = self.transform(rgb_in, msi_in, msi_out)
+            msi_in, hsi_in = self.transform(msi_in, hsi_in, None)
 
-        print(rgb_in.shape, msi_in.shape, msi_out.shape)
-
-        exit(1)
-
-        input = np.concatenate((msi_in, rgb_in), axis=2)
-
-        input = torch.from_numpy(input).float()
-        target = torch.from_numpy(msi_out).float()
+        input = torch.cat((hsi_in, msi_in), 2)
+        target = coeffs_out
 
         return input, target

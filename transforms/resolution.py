@@ -59,4 +59,4 @@ class Resolution:
             )
 
     def __str__(self) -> str:
-        return f"High resolution: {high_res}, Low resolution: {low_res}"
+        return f"High resolution: {self.high_res}, Low resolution: {self.low_res}"
