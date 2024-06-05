@@ -1,5 +1,6 @@
 from .crop import Crop
 from .resolution import Resolution
+from .res_torch import ResTorch
 from .bands import Bands
 from .compose import Compose
 
@@ -22,3 +23,8 @@ def get_transform(transform: str):
                 Bands(4, 31, None),
             ]
         )
+
+    if transform == "512x512":
+        return ResTorch(256, 512)
+
+    return None

@@ -23,16 +23,12 @@ class IcasspDataModule(LightningDataModule):
         test_split = self.hparams.test_split
         train_transform = get_transform(self.hparams.transform)
         train_preprocessing = None  # Do we really need preprocessing?
-        res = self.hparams.res
-        bands = self.hparams.bands
 
         self.train = IcasspDataset(
             path.join(base_path, "train"),
             train_split,
             train_transform,
             train_preprocessing,
-            res,
-            bands,
         )
 
         self.val = IcasspDataset(
@@ -40,8 +36,6 @@ class IcasspDataModule(LightningDataModule):
             val_split,
             train_transform,
             train_preprocessing,
-            res,
-            bands,
         )
 
         self.test = IcasspDataset(
@@ -49,8 +43,6 @@ class IcasspDataModule(LightningDataModule):
             test_split,
             train_transform,
             train_preprocessing,
-            res,
-            bands,
         )
 
     def train_dataloader(self):
@@ -83,8 +75,6 @@ class IcasspDataset(Dataset):
         transform: Optional[Callable] = None,
         preprocessing: Optional[str] = None,
         fold: Optional[int] = None,
-        res: Optional[int] = 256,
-        bands: Optional[int] = 31,
         **kwargs,
     ):
         super().__init__()
