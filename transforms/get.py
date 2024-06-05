@@ -25,6 +25,6 @@ def get_transform(transform: str):
         )
 
     if transform == "512x512":
-        return ResTorch(256, 512)
+        return ResTorch(256, 512, 512)
 
     return None

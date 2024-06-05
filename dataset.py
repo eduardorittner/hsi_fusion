@@ -164,9 +164,11 @@ class IcasspDataset(Dataset):
         hsi_in = torch.from_numpy(hsi_in)
         coeffs_out = torch.from_numpy(coeffs_out)
 
+        print(msi_in.size(), hsi_in.size())
         if self.transform is not None:
             msi_in, hsi_in = self.transform(msi_in, hsi_in, None)
 
+        print(msi_in.size(), hsi_in.size())
         input = torch.cat((hsi_in, msi_in), 2)
         target = coeffs_out
 

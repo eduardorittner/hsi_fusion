@@ -16,10 +16,18 @@ train_loader = dataloader.train_dataloader()
 test_loader = dataloader.test_dataloader()
 val_loader = dataloader.val_dataloader()
 
+for thing in train_loader:
+    print(thing)
+train_in, train_out = train_loader(0)
+test_in, test_out = test_loader(0)
+val_in, val_out = val_loader(0)
+
+print(f"train: in [{train_in.size}] - out [{train_out.size}]")
+print(f"test: in [{test_in.size}] - out [{test_out.size}]")
+print(f"val: in [{val_in.size}] - out [{val_out.size}]")
+
 device = (
     "cuda"
     if torch.cuda.is_available()
     else "mps" if torch.backends.mps.is_available() else "cpu"
 )
-
-print(train_loader, test_loader, val_loader)
