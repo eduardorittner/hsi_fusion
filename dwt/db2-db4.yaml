@@ -4,7 +4,7 @@ msi_in_files: "/home/eduardo/data/msi_in/"
 msi_out_files: "/home/eduardo/data/msi_out/"
 
 method: "3d-dwt"
-wavelet: "db2,db2,db4"
+wavelet: "db2,db4,db4"
 level: 2
 metrics: "ssim,sam,psnr"
 
