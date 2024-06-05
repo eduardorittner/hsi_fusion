@@ -12,4 +12,6 @@ for file in files:
     coeffs, slices, shapes = pywt.ravel_coeffs(pywt.wavedecn(img, "coif1", level=2))
     print(coeffs.max())
     print(coeffs.min())
+
+    pywt.waverecn(pywt.unravel_coeffs(coeffs, slices, shapes, output_format="wavedecn"))
     exit()
