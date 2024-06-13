@@ -1,5 +1,6 @@
 from .crop import Crop
 from .resolution import Resolution
+from .channel import Channel
 from .res_torch import ResTorch
 from .bands import Bands
 from .compose import Compose
@@ -26,5 +27,21 @@ def get_transform(transform: str):
 
     if transform == "512x512":
         return ResTorch(256, 512, 512)
+
+    if transform == "cnf512x512":
+        return Compose(
+            [
+                ResTorch(256, 512, 512),
+                Channel(False),
+            ]
+        )
+
+    if transform == "cf512x512":
+        return Compose(
+            [
+                ResTorch(256, 512, 512),
+                Channel(True),
+            ]
+        )
 
     return None
