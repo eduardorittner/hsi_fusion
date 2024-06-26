@@ -215,7 +215,7 @@ def fuse_3dDWT(
     )
 
     # Remove one band if there's one too many
-    if min(result.shape) == original_bands - 1:
+    if min(result.shape) == original_bands + 1:
         result = np.delete(result, -1, np.argmin(result.shape))
 
     return result
