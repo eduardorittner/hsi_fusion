@@ -20,9 +20,9 @@ from datetime import datetime
 
 
 def run_dwt(
-    rgb_in_files: List[str],
     msi_in_files: List[str],
-    msi_out_files: List[str],
+    hsi_in_files: List[str],
+    hsi_out_files: List[str],
     method: str,
     wavelet: type[List[str] | str],
     level: int,
@@ -65,7 +65,7 @@ def run_dwt(
 
     if isdir(dir):
         n_files = len(glob.glob(join(dir, "*.npy")))
-        if n_files == len(rgb_in_files):
+        if n_files == len(msi_in_files):
             print("Results for this config have already been calculated.")
             return
         print(f"{n_files} have already been calculated, resuming")
@@ -76,42 +76,42 @@ def run_dwt(
 
     with open(join(dir, "method.txt"), "w") as f:
         f.write(
-            f"""Reading files from: {rgb_in_files[0].split("/")[-3]}
+            f"""Reading files from: {msi_in_files[0].split("/")[-3]}
 {method} with wavelet(s): {wavelet}, level: {level}
 metric(s): {metrics} stored in {dir}
 """
         )
 
     print(
-        f"""Reading files from: {rgb_in_files[0].split("/")[-3]}
+        f"""Reading files from: {msi_in_files[0].split("/")[-3]}
 {method} with wavelet(s): {wavelet}, level: {level}
 metric(s): {metrics} stored in {dir}
     """
     )
 
-    for i in tqdm(range(n_files, len(rgb_in_files))):
-        rgb_in = np.load(rgb_in_files[i])
+    for i in tqdm(range(n_files, len(msi_in_files))):
         msi_in = np.load(msi_in_files[i])
-        expected = np.load(msi_out_files[i])
+        hsi_in = np.load(hsi_in_files[i])
+        expected = np.load(hsi_out_files[i])
 
-        rgb_in, msi_in, expected = transforms(rgb_in, msi_in, expected)
+        msi_in, hsi_in, expected = transforms(msi_in, hsi_in, expected)
 
         if method == "3d-dwt":
-            result = fuse_3dDWT(rgb_in, msi_in, wavelet, level, None)
+            result = fuse_3dDWT(msi_in, hsi_in, wavelet, level, None)
 
         elif method == "2d-dwt":
-            result = fuse_2dDWT(rgb_in, msi_in, wavelet, level, None)
+            result = fuse_2dDWT(msi_in, hsi_in, wavelet, level, None)
 
         elif method == "average":
-            result = fuse_average(rgb_in, msi_in, None)
-
-        elif method == "baseline-msi":
-            result = rgb_in
+            result = fuse_average(msi_in, hsi_in, None)
 
         elif method == "baseline-msi":
             result = msi_in
 
-        id = image_id(rgb_in_files[i])
+        elif method == "baseline-msi":
+            result = hsi_in
+
+        id = image_id(msi_in_files[i])
 
         results = {}
 
@@ -218,13 +218,13 @@ def run_dwt_suite(dir: str):
             continue
 
         print(f"Running {file}")
-        rgb_in_files = sorted(glob.glob(join(config["rgb_in_files"], "*.npy")))
         msi_in_files = sorted(glob.glob(join(config["msi_in_files"], "*.npy")))
-        msi_out_files = sorted(glob.glob(join(config["msi_out_files"], "*.npy")))
+        hsi_in_files = sorted(glob.glob(join(config["hsi_in_files"], "*.npy")))
+        hsi_out_files = sorted(glob.glob(join(config["hsi_out_files"], "*.npy")))
         run_dwt(
-            rgb_in_files,
             msi_in_files,
-            msi_out_files,
+            hsi_in_files,
+            hsi_out_files,
             config["method"],
             config["wavelet"].split(","),
             config["level"],
@@ -308,14 +308,14 @@ if __name__ == "__main__":
     if args.config is not None:
         # Read from config file
         config = read_yaml(args.config, False)
-        rgb_in_files = sorted(glob.glob(join(config["rgb_in_files"], "*.npy")))
         msi_in_files = sorted(glob.glob(join(config["msi_in_files"], "*.npy")))
-        msi_out_files = sorted(glob.glob(join(config["msi_out_files"], "*.npy")))
+        hsi_in_files = sorted(glob.glob(join(config["hsi_in_files"], "*.npy")))
+        hsi_out_files = sorted(glob.glob(join(config["hsi_out_files"], "*.npy")))
 
         results = run_dwt(
-            rgb_in_files,
             msi_in_files,
-            msi_out_files,
+            hsi_in_files,
+            hsi_out_files,
             config["method"],
             config["wavelet"].split(","),
             config["level"],
@@ -329,9 +329,9 @@ if __name__ == "__main__":
             print(f"ERROR: Directory {args.source} does not exist.")
             exit(1)
 
-        rgb_in_files = sorted(glob.glob(join(args.source, "rgb_in/*.npy")))
         msi_in_files = sorted(glob.glob(join(args.source, "msi_in/*.npy")))
-        msi_out_files = sorted(glob.glob(join(args.source, "msi_out/*.npy")))
+        hsi_in_files = sorted(glob.glob(join(args.source, "hsi_in/*.npy")))
+        hsi_out_files = sorted(glob.glob(join(args.source, "hsi_out/*.npy")))
 
         method = args.method
 
@@ -356,9 +356,9 @@ if __name__ == "__main__":
         transforms = Compose([Resolution(1024, 1024), Bands(61, 61, None)])
 
         results = run_dwt(
-            rgb_in_files,
             msi_in_files,
-            msi_out_files,
+            hsi_in_files,
+            hsi_out_files,
             method,
             wavelet,
             level,
