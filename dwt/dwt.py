@@ -194,6 +194,8 @@ def fuse_3dDWT(
     transform: Callable,
 ) -> np.ndarray:
 
+    original_bands = min(msi_in.shape)
+
     if transform is not None:
         rgb_in, msi_in, _ = transform(rgb_in, msi_in, None)
 
@@ -212,8 +214,8 @@ def fuse_3dDWT(
         wavelet=wavelet,
     )
 
-    # Wavelet transform return one extra duplicate band in the end
-    if level == 2:
-        result = np.delete(result, -1, 2)
+    # Remove one band if there's one too many
+    if min(result.shape) == original_bands - 1:
+        result = np.delete(result, -1, np.argmin(result.shape))
 
     return result
