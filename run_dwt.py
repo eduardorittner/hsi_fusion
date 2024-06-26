@@ -10,9 +10,9 @@ from transforms.get import get_transform
 from transforms.resolution import Resolution
 from transforms.bands import Bands
 from transforms.compose import Compose
-from metrics.ssim import metric_ssim, metric_join_ssim
-from metrics.sam import metric_sam, metric_join_sam
-from metrics.psnr import metric_psnr, metric_join_psnr
+from metrics.ssim import metric_ssim
+from metrics.sam import metric_sam
+from metrics.psnr import metric_psnr
 import numpy as np
 from utils.image_id import image_id
 from utils.read_yaml import read_yaml
@@ -23,13 +23,15 @@ def run_dwt(
     msi_in_files: List[str],
     hsi_in_files: List[str],
     hsi_out_files: List[str],
+    face_files: List[str] | None,
     method: str,
-    wavelet: type[List[str] | str],
+    wavelet: List[str] | str,
     level: int,
     metrics: List[str],
+    use_face: bool | None,
     dir: str,
-    transforms: List[Callable],
-):
+    transforms: Callable | None,
+) -> Dict | None:
 
     dir_str = ""
 
@@ -67,7 +69,7 @@ def run_dwt(
         n_files = len(glob.glob(join(dir, "*.npy")))
         if n_files == len(msi_in_files):
             print("Results for this config have already been calculated.")
-            return
+            return None
         print(f"{n_files} have already been calculated, resuming")
 
     else:
@@ -94,7 +96,8 @@ metric(s): {metrics} stored in {dir}
         hsi_in = np.load(hsi_in_files[i])
         expected = np.load(hsi_out_files[i])
 
-        msi_in, hsi_in, expected = transforms(msi_in, hsi_in, expected)
+        if transforms is not None:
+            msi_in, hsi_in, expected = transforms(msi_in, hsi_in, expected)
 
         if method == "3d-dwt":
             result = fuse_3dDWT(msi_in, hsi_in, wavelet, level, None)
@@ -130,7 +133,7 @@ def save_image_result(image_id: str, results: Dict, dir: str):
     np.save(image_path, np.array(results))
 
 
-def access_metrics(r) -> Dict:
+def access_metrics(r):
     # This is necessary to access a np array of type object
 
     return r["ssim"], r["sam"], r["psnr"]
@@ -138,18 +141,16 @@ def access_metrics(r) -> Dict:
 
 def calculate_mean(dir: str, metrics: List[str]) -> Dict:
     files = sorted(glob.glob(dir + "*.npy"))
-    results = None
+
+    results = {}
+    for metric in metrics:
+        results[metric] = 0
 
     for file in files:
         ssim, sam, psnr = np.vectorize(access_metrics)(np.load(file, allow_pickle=True))
         r = {"ssim": ssim, "sam": sam, "psnr": psnr}
-        if results is None:
-            results = {}
-            for metric in metrics:
-                results[metric] = r[metric]
-        else:
-            for metric in metrics:
-                results[metric] += r[metric]
+        for metric in metrics:
+            results[metric] += r[metric]
 
     for metric in metrics:
         results[metric] /= len(files)
@@ -157,8 +158,9 @@ def calculate_mean(dir: str, metrics: List[str]) -> Dict:
     return results
 
 
-def calculate_deviation(dir: str, metrics: List[str], results: Dict):
+def calculate_deviation(dir: str, metrics: List[str], results: Dict) -> Dict:
     files = sorted(glob.glob(dir + "*.npy"))
+
     deviation = None
 
     for file in files:
@@ -367,11 +369,12 @@ if __name__ == "__main__":
             transforms,
         )
 
-        print("Results calculated:")
-        if "ssim" in results.keys():
-            print(f"SSIM: {results['ssim'][0]}")
-        if "sam" in results.keys():
-            print(f"sam: {results['sam']}")
-        if "psnr" in results.keys():
-            print(f"psnr: {results['psnr']}")
-        print("------------------")
+        if results is not None:
+            print("Results calculated:")
+            if "ssim" in results.keys():
+                print(f"SSIM: {results['ssim'][0]}")
+            if "sam" in results.keys():
+                print(f"sam: {results['sam']}")
+            if "psnr" in results.keys():
+                print(f"psnr: {results['psnr']}")
+            print("------------------")

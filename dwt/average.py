@@ -3,7 +3,7 @@ from typing import List, Callable
 
 
 def fuse_average(
-    rgb_in: np.ndarray, msi_in: np.ndarray, transform: List[Callable]
+    rgb_in: np.ndarray, msi_in: np.ndarray, transform: Callable | None
 ) -> np.ndarray:
 
     if transform is not None:

@@ -4,10 +4,10 @@ from typing import Tuple, Optional, List
 
 
 class Bands:
-    def __init__(self, low_bands: int, high_bands: int, bands_strategy: str):
+    def __init__(self, low_bands: int, high_bands: int, bands_strategy: str | None):
         self.low_bands = low_bands
         self.high_bands = high_bands
-        self.bands_strategy = None
+        self.bands_strategy = bands_strategy
 
     def upsample_band(
         self,

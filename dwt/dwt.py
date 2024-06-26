@@ -156,9 +156,9 @@ def fuse_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarray):
 def fuse_2dDWT(
     rgb_in: np.ndarray,
     msi_in: np.ndarray,
-    wavelet: type[str | List[str]],
+    wavelet: str | List[str],
     level: int,
-    transform: Callable,
+    transform: Callable | None,
 ) -> np.ndarray:
     if transform is not None:
         rgb_in, msi_in, _ = transform(rgb_in, msi_in, None)
@@ -189,9 +189,9 @@ def fuse_2dDWT(
 def fuse_3dDWT(
     rgb_in: np.ndarray,
     msi_in: np.ndarray,
-    wavelet: type[str | List[str]],
+    wavelet: str | List[str],
     level: int,
-    transform: Callable,
+    transform: Callable | None,
 ) -> np.ndarray:
 
     original_bands = min(msi_in.shape)
