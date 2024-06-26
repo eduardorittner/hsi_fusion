@@ -116,9 +116,26 @@ metric(s): {metrics} stored in {dir}
         elif method == "baseline-msi":
             result = hsi_in
 
+        else:
+            print(f"[ERROR]: the method {method} not implemented")
+            exit(1)
+
         id = image_id(msi_in_files[i])
 
         results = {}
+
+        if use_face:
+            if face_files is not None:
+                face = np.load(face_files[i])
+
+            else:
+                print(
+                    f"[ERROR]: face flag is set to True but no face files were provided"
+                )
+                exit(1)
+
+            result = result * face
+            expected = expected * face
 
         if "ssim" in metrics:
             results["ssim"] = metric_ssim(result, expected)
@@ -225,14 +242,22 @@ def run_dwt_suite(dir: str):
         msi_in_files = sorted(glob.glob(join(config["msi_in_files"], "*.npy")))
         hsi_in_files = sorted(glob.glob(join(config["hsi_in_files"], "*.npy")))
         hsi_out_files = sorted(glob.glob(join(config["hsi_out_files"], "*.npy")))
+
+        face_files = None
+
+        if config.get("face"):
+            face_files = sorted(glob.glob(join(config["face_files"], "*.npy")))
+
         run_dwt(
             msi_in_files,
             hsi_in_files,
             hsi_out_files,
+            face_files,
             config["method"],
             config["wavelet"].split(","),
             config["level"],
             config["metrics"].split(","),
+            config["face"],
             config["dir"],
             get_transform(config["transforms"]),
         )
@@ -288,6 +313,9 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--suite", type=str, help="Path to configs")
     parser.add_argument("-r", "--results", type=str, help="Calculate results")
     parser.add_argument("-a", "--aggregate", type=str, help="Aggregate results")
+    parser.add_argument(
+        "-f", "--face", type=bool, help="Whether to use metrics on face or whole image"
+    )
 
     args = parser.parse_args()
 
@@ -316,14 +344,21 @@ if __name__ == "__main__":
         hsi_in_files = sorted(glob.glob(join(config["hsi_in_files"], "*.npy")))
         hsi_out_files = sorted(glob.glob(join(config["hsi_out_files"], "*.npy")))
 
+        face_files = None
+
+        if config.get("face"):
+            face_files = sorted(glob.glob(join(config["face_files"], "*.npy")))
+
         results = run_dwt(
             msi_in_files,
             hsi_in_files,
             hsi_out_files,
+            face_files,
             config["method"],
             config["wavelet"].split(","),
             config["level"],
             config["metrics"].split(","),
+            config["face"],
             config["dir"],
             get_transform(config["transforms"]),
         )
@@ -336,6 +371,12 @@ if __name__ == "__main__":
         msi_in_files = sorted(glob.glob(join(args.source, "msi_in/*.npy")))
         hsi_in_files = sorted(glob.glob(join(args.source, "hsi_in/*.npy")))
         hsi_out_files = sorted(glob.glob(join(args.source, "hsi_out/*.npy")))
+
+        face_files = None
+        face = args.face
+
+        if face:
+            face_files = sorted(glob.glob(join(args.source, "faces/*.npy")))
 
         method = args.method
 
@@ -363,10 +404,12 @@ if __name__ == "__main__":
             msi_in_files,
             hsi_in_files,
             hsi_out_files,
+            face_files,
             method,
             wavelet,
             level,
             metrics,
+            face,
             dir,
             transforms,
         )
