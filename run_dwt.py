@@ -23,12 +23,12 @@ def run_dwt(
     msi_in_files: List[str],
     hsi_in_files: List[str],
     hsi_out_files: List[str],
-    face_files: List[str] | None,
+    mask_files: List[str] | None,
     method: str,
     wavelet: List[str] | str,
     level: int,
     metrics: List[str],
-    use_face: bool | None,
+    use_mask: bool | None,
     dir: str,
     transforms: Callable | None,
 ) -> Dict | None:
@@ -64,8 +64,8 @@ def run_dwt(
         dir_str = "baseline-hsi"
 
     dir = dir + dir_str
-    if use_face:
-        dir += "-face"
+    if use_mask:
+        dir += "-mask"
 
     if isdir(dir):
         n_files = len(glob.glob(join(dir, "*.npy")))
@@ -124,18 +124,18 @@ metric(s): {metrics} stored in {dir}
 
         results = {}
 
-        if use_face:
-            if face_files is not None:
-                face = np.load(face_files[i])
+        if use_mask:
+            if mask_files is not None:
+                mask = np.load(mask_files[i])
 
             else:
                 print(
-                    f"[ERROR]: face flag is set to True but no face files were provided"
+                    f"[ERROR]: mask flag is set to True but no mask files were provided"
                 )
                 exit(1)
 
-            result = result * face
-            expected = expected * face
+            result = result * mask
+            expected = expected * mask
 
         if "ssim" in metrics:
             results["ssim"] = metric_ssim(result, expected)
@@ -243,21 +243,21 @@ def run_dwt_suite(dir: str):
         hsi_in_files = sorted(glob.glob(join(config["hsi_in_files"], "*.npy")))
         hsi_out_files = sorted(glob.glob(join(config["hsi_out_files"], "*.npy")))
 
-        face_files = None
+        mask_files = None
 
-        if config.get("face"):
-            face_files = sorted(glob.glob(join(config["face_files"], "*.npy")))
+        if config.get("mask"):
+            mask_files = sorted(glob.glob(join(config["mask_files"], "*.npy")))
 
         run_dwt(
             msi_in_files,
             hsi_in_files,
             hsi_out_files,
-            face_files,
+            mask_files,
             config["method"],
             config["wavelet"].split(","),
             config["level"],
             config["metrics"].split(","),
-            config["face"],
+            config["mask"],
             config["dir"],
             get_transform(config["transforms"]),
         )
@@ -314,7 +314,7 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--results", type=str, help="Calculate results")
     parser.add_argument("-a", "--aggregate", type=str, help="Aggregate results")
     parser.add_argument(
-        "-f", "--face", type=bool, help="Whether to use metrics on face or whole image"
+        "-f", "--mask", type=bool, help="Whether to use metrics on mask or whole image"
     )
 
     args = parser.parse_args()
@@ -344,21 +344,21 @@ if __name__ == "__main__":
         hsi_in_files = sorted(glob.glob(join(config["hsi_in_files"], "*.npy")))
         hsi_out_files = sorted(glob.glob(join(config["hsi_out_files"], "*.npy")))
 
-        face_files = None
+        mask_files = None
 
-        if config.get("face"):
-            face_files = sorted(glob.glob(join(config["face_files"], "*.npy")))
+        if config.get("mask"):
+            mask_files = sorted(glob.glob(join(config["mask_files"], "*.npy")))
 
         results = run_dwt(
             msi_in_files,
             hsi_in_files,
             hsi_out_files,
-            face_files,
+            mask_files,
             config["method"],
             config["wavelet"].split(","),
             config["level"],
             config["metrics"].split(","),
-            config["face"],
+            config["mask"],
             config["dir"],
             get_transform(config["transforms"]),
         )
@@ -372,11 +372,11 @@ if __name__ == "__main__":
         hsi_in_files = sorted(glob.glob(join(args.source, "hsi_in/*.npy")))
         hsi_out_files = sorted(glob.glob(join(args.source, "hsi_out/*.npy")))
 
-        face_files = None
-        face = args.face
+        mask_files = None
+        mask = args.mask
 
-        if face:
-            face_files = sorted(glob.glob(join(args.source, "faces/*.npy")))
+        if mask:
+            mask_files = sorted(glob.glob(join(args.source, "masks/*.npy")))
 
         method = args.method
 
@@ -404,12 +404,12 @@ if __name__ == "__main__":
             msi_in_files,
             hsi_in_files,
             hsi_out_files,
-            face_files,
+            mask_files,
             method,
             wavelet,
             level,
             metrics,
-            face,
+            mask,
             dir,
             transforms,
         )
