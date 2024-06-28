@@ -64,6 +64,8 @@ def run_dwt(
         dir_str = "baseline-hsi"
 
     dir = dir + dir_str
+    if use_face:
+        dir += "-face"
 
     if isdir(dir):
         n_files = len(glob.glob(join(dir, "*.npy")))
