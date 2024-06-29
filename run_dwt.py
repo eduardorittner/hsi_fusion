@@ -14,7 +14,7 @@ from metrics.ssim import metric_ssim
 from metrics.sam import metric_sam
 from metrics.psnr import metric_psnr
 import numpy as np
-from utils.image_id import image_id
+from utils.image_id import image_id, mask_id
 from utils.read_yaml import read_yaml
 from datetime import datetime
 
@@ -134,10 +134,8 @@ metric(s): {metrics} stored in {dir}
                 )
                 exit(1)
 
-            mask_id = mask_files[i].split("-")[0]
-
-            if mask_id != id:
-                print("[ERROR]: Mask id ({mask_id}) and image id ({id}) must be the same.")
+            if mask_id(mask_files[i]) != id:
+                print("[ERROR]: Mask id ({mask_id(mask_files[i])}) and image id ({id}) must be the same.")
                 exit(1)
 
             print(mask)
