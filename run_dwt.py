@@ -135,7 +135,7 @@ metric(s): {metrics} stored in {dir}
                 exit(1)
 
             if mask_id(mask_files[i]) != id:
-                print("[ERROR]: Mask id ({mask_id(mask_files[i])}) and image id ({id}) must be the same.")
+                print(f"[ERROR]: Mask id ({mask_id(mask_files[i])}) and image id ({id}) must be the same.")
                 exit(1)
 
             print(mask)
