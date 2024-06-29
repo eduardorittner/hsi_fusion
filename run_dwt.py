@@ -138,23 +138,20 @@ metric(s): {metrics} stored in {dir}
                 print(f"[ERROR]: Mask id ({mask_id(mask_files[i])}) and image id ({id}) must be the same.")
                 exit(1)
 
-            print(mask)
-
             mask = np.expand_dims(mask, np.argmin(result.shape))
 
-            print(mask.shape)
-
-            print(result)
             result = result * mask
-            print(result)
             expected = expected * mask
 
         if "ssim" in metrics:
             results["ssim"] = metric_ssim(result, expected)
+            print(result["ssim"])
         if "sam" in metrics:
             results["sam"] = metric_sam(result, expected)
+            print(result["sam"])
         if "psnr" in metrics:
             results["psnr"] = metric_psnr(expected, result)
+            print(result["psnr"])
 
         save_image_result(id, results, dir)
 
