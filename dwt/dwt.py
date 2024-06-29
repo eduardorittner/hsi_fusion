@@ -35,17 +35,17 @@ class DWT2D_coeffs(object):
         return results
 
 
-def fuse_approx_2d(rgb_in: DWT2D_coeffs, msi_in: DWT2D_coeffs, fused: np.ndarray):
-    rgb = rgb_in.coeffs_approx()
-    msi = msi_in.coeffs_approx()
+def fuse_approx_2d(msi_in: DWT2D_coeffs, hsi_in: DWT2D_coeffs, fused: np.ndarray):
+    rgb = msi_in.coeffs_approx()
+    msi = hsi_in.coeffs_approx()
 
     start, stop = rgb[1].start, rgb[1].stop
 
     fused[start:stop] = (rgb[0][start:stop] + msi[0][start:stop]) / 2
 
 
-def fuse_detail_2d(rgb_in: DWT2D_coeffs, msi_in: DWT2D_coeffs, fused: np.ndarray):
-    rgb = rgb_in.coeffs_detail()
+def fuse_detail_2d(msi_in: DWT2D_coeffs, hsi_in: DWT2D_coeffs, fused: np.ndarray):
+    rgb = msi_in.coeffs_detail()
 
     for level in rgb:
         start, stop = level[1].start, level[1].stop
@@ -110,18 +110,18 @@ class DWT_coeffs(object):
         return results
 
 
-def fuse_approx(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarray):
+def fuse_approx(msi_in: DWT_coeffs, hsi_in: DWT_coeffs, fused: np.ndarray):
     # Gets the average between each pixel
-    rgb = rgb_in.coeffs_approx()
-    msi = msi_in.coeffs_approx()
+    rgb = msi_in.coeffs_approx()
+    msi = hsi_in.coeffs_approx()
 
     start, stop = rgb[1].start, rgb[1].stop
 
     fused[start:stop] = (rgb[0][start:stop] + msi[0][start:stop]) / 2
 
 
-def fuse_spatial_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarray):
-    rgb = rgb_in.coeffs_spatial_detail()
+def fuse_spatial_detail(msi_in: DWT_coeffs, hsi_in: DWT_coeffs, fused: np.ndarray):
+    rgb = msi_in.coeffs_spatial_detail()
 
     for level in rgb:
         start, stop = level[1].start, level[1].stop
@@ -129,8 +129,8 @@ def fuse_spatial_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarra
         fused[start:stop] = level[0][: stop - start]
 
 
-def fuse_spectral_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarray):
-    msi = msi_in.coeffs_spectral_detail()
+def fuse_spectral_detail(msi_in: DWT_coeffs, hsi_in: DWT_coeffs, fused: np.ndarray):
+    msi = hsi_in.coeffs_spectral_detail()
 
     for level in msi:
         start, stop = level[1].start, level[1].stop
@@ -140,9 +140,9 @@ def fuse_spectral_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarr
     return
 
 
-def fuse_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarray):
-    rgb = rgb_in.coeffs_detail_both()
-    msi = msi_in.coeffs_detail_both()
+def fuse_detail(msi_in: DWT_coeffs, hsi_in: DWT_coeffs, fused: np.ndarray):
+    rgb = msi_in.coeffs_detail_both()
+    msi = hsi_in.coeffs_detail_both()
 
     for rgb_subband, msi_subband in zip(rgb, msi):
         start, stop = rgb_subband[1].start, rgb_subband[1].stop
@@ -154,20 +154,20 @@ def fuse_detail(rgb_in: DWT_coeffs, msi_in: DWT_coeffs, fused: np.ndarray):
 
 
 def fuse_2dDWT(
-    rgb_in: np.ndarray,
     msi_in: np.ndarray,
+    hsi_in: np.ndarray,
     wavelet: str | List[str],
     level: int,
     transform: Callable | None,
 ) -> np.ndarray:
     if transform is not None:
-        rgb_in, msi_in, _ = transform(rgb_in, msi_in, None)
+        msi_in, hsi_in, _ = transform(msi_in, hsi_in, None)
 
-    results = np.zeros(rgb_in.shape)
+    results = np.zeros(msi_in.shape)
 
-    for band in range(rgb_in.shape[2]):
-        rgb_coeffs = DWT2D_coeffs(rgb_in[:, :, band], wavelet, level)
-        msi_coeffs = DWT2D_coeffs(msi_in[:, :, band], wavelet, level)
+    for band in range(msi_in.shape[2]):
+        rgb_coeffs = DWT2D_coeffs(msi_in[:, :, band], wavelet, level)
+        msi_coeffs = DWT2D_coeffs(hsi_in[:, :, band], wavelet, level)
 
         fused_coeffs = rgb_coeffs.copy_coeffs()
         fuse_approx_2d(rgb_coeffs, msi_coeffs, fused_coeffs)
@@ -187,20 +187,20 @@ def fuse_2dDWT(
 
 
 def fuse_3dDWT(
-    rgb_in: np.ndarray,
     msi_in: np.ndarray,
+    hsi_in: np.ndarray,
     wavelet: str | List[str],
     level: int,
     transform: Callable | None,
 ) -> np.ndarray:
 
-    original_bands = min(msi_in.shape)
+    original_bands = min(hsi_in.shape)
 
     if transform is not None:
-        rgb_in, msi_in, _ = transform(rgb_in, msi_in, None)
+        msi_in, hsi_in, _ = transform(msi_in, hsi_in, None)
 
-    rgb_coeffs = DWT_coeffs(rgb_in, wavelet, level)
-    msi_coeffs = DWT_coeffs(msi_in, wavelet, level)
+    rgb_coeffs = DWT_coeffs(msi_in, wavelet, level)
+    msi_coeffs = DWT_coeffs(hsi_in, wavelet, level)
 
     fused_coeffs = rgb_coeffs.copy_coeffs()
 

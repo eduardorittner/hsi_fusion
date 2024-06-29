@@ -1,7 +1,7 @@
 run: "true"
-rgb_in_files: "/home/eduardo/data/rgb_in/"
 msi_in_files: "/home/eduardo/data/msi_in/"
-msi_out_files: "/home/eduardo/data/msi_out/"
+hsi_in_files: "/home/eduardo/data/hsi_in/"
+hsi_out_files: "/home/eduardo/data/hsi_out/"
 
 method: "3d-dwt"
 wavelet: "db2,coif2,coif2"
