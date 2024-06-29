@@ -1,6 +1,9 @@
+run: "true"
 msi_in_files: "/home/eduardo/data/msi_in/"
 hsi_in_files: "/home/eduardo/data/hsi_in/"
 hsi_out_files: "/home/eduardo/data/hsi_out/"
+mask_files: "/home/eduardo/data/masks/"
+mask: True
 
 method: "3d-dwt"
 wavelet: "coif2"
