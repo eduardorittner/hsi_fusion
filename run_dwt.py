@@ -156,7 +156,7 @@ metric(s): {metrics} stored in {dir}
         if "sam" in metrics:
             results["sam"] = metric_sam(result, expected)
         if "psnr" in metrics:
-            results["psnr"] = metric_psnr(result, expected)
+            results["psnr"] = metric_psnr(expected, result)
 
         save_image_result(id, results, dir)
 
