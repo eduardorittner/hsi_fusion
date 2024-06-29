@@ -14,6 +14,8 @@ class Resolution:
         expects image of shape [spatial][spatial][spectral]
         """
 
+        assert image.shape[1] > image.shape[2], "Bands must be at axis 2"
+
         res = (image.shape[0], image.shape[1])
         ratio = new_res // res[0]
 
