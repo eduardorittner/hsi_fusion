@@ -134,7 +134,21 @@ metric(s): {metrics} stored in {dir}
                 )
                 exit(1)
 
+            mask_id = mask_files[i].split("-")[0]
+
+            if mask_id != id:
+                print("[ERROR]: Mask id ({mask_id}) and image id ({id}) must be the same.")
+                exit(1)
+
+            print(mask)
+
+            mask = np.expand_dims(mask, np.argmin(result.shape))
+
+            print(mask.shape)
+
+            print(result)
             result = result * mask
+            print(result)
             expected = expected * mask
 
         if "ssim" in metrics:
