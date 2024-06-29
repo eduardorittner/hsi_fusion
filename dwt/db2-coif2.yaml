@@ -6,7 +6,7 @@ mask_files: "/home/eduardo/data/masks/"
 mask: True
 
 method: "3d-dwt"
-wavelet: "db2,coif2,coif2"
+wavelet: "db2,db2,coif2"
 level: 2
 metrics: "ssim,sam,psnr"
 

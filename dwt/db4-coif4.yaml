@@ -4,7 +4,7 @@ hsi_in_files: "/home/eduardo/data/hsi_in/"
 hsi_out_files: "/home/eduardo/data/hsi_out/"
 
 method: "3d-dwt"
-wavelet: "db4,coif4,coif4"
+wavelet: "db4,db4,coif4"
 level: 2
 metrics: "ssim,sam,psnr"
 
