@@ -3,8 +3,8 @@ import numpy as np
 from typing import Dict
 
 
-def metric_psnr(pred, target):
-    return psnr(pred, target, data_range=pred.max() - pred.min())
+def metric_psnr(target, pred):
+    return psnr(target, pred, data_range=pred.max() - pred.min())
 
 
 def metric_join_psnr(results: Dict) -> float:
