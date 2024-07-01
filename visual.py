@@ -27,13 +27,13 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "i",
+        "-i",
         "--image",
         type=str,
         help="Path of image to visualize, if None is provided a random image will be selected",
     )
     parser.add_argument(
-        "t",
+        "-t",
         "--type",
         type=str,
         help="Type of image: msi_in, hsi_in, hsi_out, prediction. If none is provided hsi_out will be selected",
