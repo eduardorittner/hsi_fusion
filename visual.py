@@ -1,7 +1,8 @@
-import argparse
-import numpy as np
 import glob
 from os.path import join
+import numpy as np
+import argparse
+import matplotlib
 import matplotlib.pyplot as plt
 from random import choice
 from utils.image_id import image_id
@@ -9,6 +10,7 @@ from utils.image_id import image_id
 
 def visualize_band(name: str, img: np.ndarray, band: int):
     plt.imshow(img[:, :, band])
+    plt.show()
 
 
 def visualize_bands_all(name: str, img: np.ndarray):
@@ -21,6 +23,8 @@ hsi_in_dir = "/home/eduardo/data/hsi_in/"
 hsi_out_dir = "/home/eduardo/data/hsi_out/"
 
 if __name__ == "__main__":
+    matplotlib.use("TkAgg")
+    
     parser = argparse.ArgumentParser(
         prog="visualizer",
         description="Data visualizer",
