@@ -5,26 +5,52 @@ import argparse
 import matplotlib
 import matplotlib.pyplot as plt
 from random import choice
-from utils.image_id import image_id
+from utils.image_id import image_id, mask_id
+from typing import List
 
 
-def visualize_band(name: str, img: np.ndarray, band: int):
-    plt.imshow(img[:, :, band])
+def load_mask(masks: List[str], id: str | None) -> str | None:
+    if id is None:
+        return None
+
+    for mask in masks:
+        if mask_id(mask) == id:
+            return mask
+
+    print(f"[WARNING]: Mask id {id} was not found, output shown without mask")
+    return None
+
+
+def visualize(name: str, img: np.ndarray, band: int | None, mask: np.ndarray | None):
+    if mask is not None:
+        assert (
+            img[:, :, 0].shape == mask.shape
+        ), f"Image shape ({img[:,:,0].shape}) and mask shape ({mask.shape}) must be equal."
+
+    if band is not None:
+        if mask is not None:
+            plt.imshow(img[:, :, band] * mask)
+        else:
+            plt.imshow(img[:, :, band])
+    else:
+        if mask is not None:
+            for i in range(img.shape[2]):
+                plt.imshow(img[:, :, i] * mask)
+        else:
+            for i in range(img.shape[2]):
+                plt.imshow(img[:, :, i])
+
     plt.show()
-
-
-def visualize_bands_all(name: str, img: np.ndarray):
-    for i in range(img.shape[2]):
-        plt.imshow(img[:, :, i])
 
 
 msi_in_dir = "/home/eduardo/data/msi_in/"
 hsi_in_dir = "/home/eduardo/data/hsi_in/"
 hsi_out_dir = "/home/eduardo/data/hsi_out/"
+mask_dir = "/home/eduardo/data/masks/"
 
 if __name__ == "__main__":
     matplotlib.use("TkAgg")
-    
+
     parser = argparse.ArgumentParser(
         prog="visualizer",
         description="Data visualizer",
@@ -37,11 +63,18 @@ if __name__ == "__main__":
         help="Path of image to visualize, if None is provided a random image will be selected",
     )
     parser.add_argument(
+        "-b",
+        "--band",
+        type=int,
+        help="What band to visualize. If None is given shows all bands",
+    )
+    parser.add_argument(
         "-t",
         "--type",
         type=str,
         help="Type of image: msi_in, hsi_in, hsi_out, prediction. If none is provided hsi_out will be selected",
     )
+    parser.add_argument("-m", "--masks", type=bool, help="Output with masks")
 
     args = parser.parse_args()
 
@@ -73,4 +106,9 @@ if __name__ == "__main__":
         id = image_id(img)
         img = np.load(img)
 
-    visualize_band(id, img, 9)
+    mask = load_mask(sorted(glob.glob(join(mask_dir, "*.npy"))), args.mask)
+
+    if mask is not None:
+        mask = np.load(mask)
+
+    visualize(id, img, args.band, mask)
