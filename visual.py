@@ -24,23 +24,38 @@ def visualize(name: str, img: np.ndarray, band: int | None, mask: np.ndarray | N
             img[:, :, 0].shape == mask.shape
         ), f"Image shape ({img[:,:,0].shape}) and mask shape ({mask.shape}) must be equal."
 
-    if band is not None:
+    if band is None:
+        print(f"No band was provided, visualizing first band")
+        if mask is not None:
+            plt.imshow(img[:, :, 0] * mask)
+        else:
+            plt.imshow(img[:, :, 0])
+
+        plt.show()
+    elif 0 <= band <= 60:
         if mask is not None:
             plt.imshow(img[:, :, band] * mask)
         else:
             plt.imshow(img[:, :, band])
+    elif band == 61:
+        cols = 8
+        rows = 8
+        fig, axes = plt.subplots(rows, cols, figsize=(12, 12))
+        for i in range(61):
+            row, col = divmod(i, cols)
+            if mask is not None:
+                for i in range(img.shape[2]):
+                    axes[row, col].imshow(img[:, :, i] * mask)
+            else:
+                for i in range(img.shape[2]):
+                    axes[row, col].imshow(img[:, :, i] * mask)
+            axes[row, col].set_xticks([])
+            axes[row, col].set_yticks([])
 
+        plt.tight_layout()
         plt.show()
-
     else:
-        if mask is not None:
-            for i in range(img.shape[2]):
-                plt.imshow(img[:, :, i] * mask)
-                plt.show()
-        else:
-            for i in range(img.shape[2]):
-                plt.imshow(img[:, :, i])
-                plt.show()
+        print(f"[ERROR]: Band ({band}) must be between 0 and 61")
 
 
 msi_in_dir = "/home/eduardo/data/msi_in/"
