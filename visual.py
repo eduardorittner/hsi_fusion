@@ -29,15 +29,18 @@ def visualize(name: str, img: np.ndarray, band: int | None, mask: np.ndarray | N
             plt.imshow(img[:, :, band] * mask)
         else:
             plt.imshow(img[:, :, band])
+
+        plt.show()
+
     else:
         if mask is not None:
             for i in range(img.shape[2]):
                 plt.imshow(img[:, :, i] * mask)
+                plt.show()
         else:
             for i in range(img.shape[2]):
                 plt.imshow(img[:, :, i])
-
-    plt.show()
+                plt.show()
 
 
 msi_in_dir = "/home/eduardo/data/msi_in/"
