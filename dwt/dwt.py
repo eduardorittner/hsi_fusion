@@ -199,7 +199,7 @@ def fuse_3dDWT(
     if transform is not None:
         msi_in, hsi_in, _ = transform(msi_in, hsi_in, None)
 
-    if not isinstance(wavelet, str):
+    if not isinstance(wavelet, str) and len(wavelet) > 1:
         if wavelet[0] == wavelet[1]:
             assert (
                 msi_in.shape[0] == msi_in.shape[1]
@@ -207,7 +207,7 @@ def fuse_3dDWT(
 
         else:
             assert (
-                msi_in.shape[1] == msi_in.shape[2]
+                msi_in.shape[0] == msi_in.shape[2]
             ), "Different wavelets are being applied to the same domain"
 
     rgb_coeffs = DWT_coeffs(msi_in, wavelet, level)
