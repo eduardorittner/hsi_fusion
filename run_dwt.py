@@ -145,13 +145,10 @@ metric(s): {metrics} stored in {dir}
 
         if "ssim" in metrics:
             results["ssim"] = metric_ssim(result, expected)
-            print(results["ssim"])
         if "sam" in metrics:
             results["sam"] = metric_sam(result, expected)
-            print(results["sam"])
         if "psnr" in metrics:
             results["psnr"] = metric_psnr(expected, result)
-            print(results["psnr"])
 
         save_image_result(id, results, dir)
 
