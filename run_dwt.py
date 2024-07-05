@@ -266,7 +266,7 @@ def run_dwt_suite(dir: str):
             config["wavelet"].split(","),
             config["level"],
             config["metrics"].split(","),
-            config["mask"],
+            config.get("mask"),
             config["dir"],
             get_transform(config["transforms"]),
         )
