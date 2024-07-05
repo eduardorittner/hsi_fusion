@@ -32,11 +32,14 @@ def visualize(name: str, img: np.ndarray, band: int | None, mask: np.ndarray | N
             plt.imshow(img[:, :, 0])
 
         plt.show()
+
     elif 0 <= band <= 60:
         if mask is not None:
             plt.imshow(img[:, :, band] * mask)
         else:
             plt.imshow(img[:, :, band])
+        plt.show()
+
     elif band == 61:
         cols = 8
         rows = 8
@@ -54,6 +57,7 @@ def visualize(name: str, img: np.ndarray, band: int | None, mask: np.ndarray | N
 
         plt.tight_layout()
         plt.show()
+
     else:
         print(f"[ERROR]: Band ({band}) must be between 0 and 61")
 
@@ -81,7 +85,7 @@ if __name__ == "__main__":
         "-b",
         "--band",
         type=int,
-        help="What band to visualize. If None is given shows all bands",
+        help="What band to visualize. If None is given shows first band",
     )
     parser.add_argument(
         "-t",
