@@ -9,10 +9,7 @@ from utils.image_id import image_id, mask_id
 from typing import List
 
 
-def load_mask(masks: List[str], id: str | None) -> str | None:
-    if id is None:
-        return None
-
+def load_mask(masks: List[str], id: str) -> str | None:
     for mask in masks:
         if mask_id(mask) == id:
             return mask
@@ -106,7 +103,10 @@ if __name__ == "__main__":
         id = image_id(img)
         img = np.load(img)
 
-    mask = load_mask(sorted(glob.glob(join(mask_dir, "*.npy"))), args.masks)
+    if args.masks:
+        mask = load_mask(sorted(glob.glob(join(mask_dir, "*.npy"))), id)
+    else:
+        mask = None
 
     if mask is not None:
         mask = np.load(mask)
