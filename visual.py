@@ -106,7 +106,7 @@ if __name__ == "__main__":
         id = image_id(img)
         img = np.load(img)
 
-    mask = load_mask(sorted(glob.glob(join(mask_dir, "*.npy"))), args.mask)
+    mask = load_mask(sorted(glob.glob(join(mask_dir, "*.npy"))), args.masks)
 
     if mask is not None:
         mask = np.load(mask)
