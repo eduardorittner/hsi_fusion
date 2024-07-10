@@ -27,7 +27,7 @@ unet = monai.networks.nets.UNet(
 
 def dwt(input):
     return torch.from_numpy(
-        pywt.coeffs_to_array(pywt.wavedecn(input, "db4", level=2), padding=0.0)
+        pywt.coeffs_to_array(pywt.wavedecn(input, "db4", level=2), padding=0.0)[0]
     )
 
 
