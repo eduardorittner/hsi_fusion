@@ -12,7 +12,7 @@ class UNetModel(pl.LightningModule):
 
     def load_batch(self, batch):
         input, target = batch
-        target = self.dwt(target)
+        target = self.dwt(target.cpu())
         pred = self.net(input)
         return pred, target
 
