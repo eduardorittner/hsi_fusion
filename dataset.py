@@ -115,7 +115,7 @@ class IcasspDataset(Dataset):
         self.coeffs_out: List[str] = sorted(
             [
                 i
-                for i in glob(path.join(self.base_path, "coeffs", fmt))
+                for i in glob(path.join(self.base_path, "hsi_out", fmt))
                 if any(name in i for name in names)
             ]
         )
@@ -130,7 +130,7 @@ class IcasspDataset(Dataset):
 
         assert (
             dir_lens_match
-            ), f"One of the 3 directories does not contain {self.total_files} files: msi_in - {len(self.msi_in)}, hsi_in - {len(self.hsi_in)}, coeffs_out - {len(self.coeffs_out)}"
+        ), f"One of the 3 directories does not contain {self.total_files} files: msi_in - {len(self.msi_in)}, hsi_in - {len(self.hsi_in)}, hsi_out - {len(self.hsi_out)}"
 
         print(self.init_str())
 
@@ -141,14 +141,14 @@ class IcasspDataset(Dataset):
         return self.total_files
 
     def load_image(
-        self, hsi_in_path: str, msi_in_path: str, coeffs_out_path: str
+        self, hsi_in_path: str, msi_in_path: str, hsi_out_path: str
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
         hsi_in = np.load(hsi_in_path)
         msi_in = np.load(msi_in_path)
-        coeffs_out = np.load(coeffs_out_path)
+        hsi_out = np.load(hsi_out_path)
 
-        return msi_in, hsi_in, coeffs_out
+        return msi_in, hsi_in, hsi_out
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         """
@@ -156,20 +156,20 @@ class IcasspDataset(Dataset):
         Resulting size is [122,1024,1024]
         """
 
-        msi_in, hsi_in, coeffs_out = self.load_image(
-            self.hsi_in[idx], self.msi_in[idx], self.coeffs_out[idx]
+        msi_in, hsi_in, hsi_out = self.load_image(
+            self.hsi_in[idx], self.msi_in[idx], self.hsi_out[idx]
         )
 
         msi_in = torch.from_numpy(msi_in)
         hsi_in = torch.from_numpy(hsi_in)
-        coeffs_out = torch.from_numpy(coeffs_out)
+        hsi_out = torch.from_numpy(hsi_out)
 
-        print(msi_in.size(), hsi_in.size())
+        print(msi_in.size(), hsi_in.size(), hsi_out.size())
         if self.transform is not None:
-            msi_in, hsi_in = self.transform(msi_in, hsi_in, None)
+            msi_in, hsi_in, hsi_out = self.transform(msi_in, hsi_in, hsi_out)
 
-        print(msi_in.size(), hsi_in.size())
         input = torch.cat((hsi_in, msi_in), 2)
-        target = coeffs_out
+        target = hsi_out
+        print(input.size, target.size)
 
         return input, target
