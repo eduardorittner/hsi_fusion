@@ -165,12 +165,10 @@ class IcasspDataset(Dataset):
         hsi_in = torch.from_numpy(hsi_in)
         hsi_out = torch.from_numpy(hsi_out)
 
-        print(msi_in.size(), hsi_in.size(), hsi_out.size())
         if self.transform is not None:
             msi_in, hsi_in, hsi_out = self.transform(msi_in, hsi_in, hsi_out)
 
         input = torch.cat((hsi_in, msi_in), 2)
         target = hsi_out
-        print(input.size, target.size)
 
         return input, target
