@@ -112,7 +112,7 @@ class IcasspDataset(Dataset):
                 if any(name in i for name in names)
             ]
         )
-        self.coeffs_out: List[str] = sorted(
+        self.hsi_out: List[str] = sorted(
             [
                 i
                 for i in glob(path.join(self.base_path, "hsi_out", fmt))
