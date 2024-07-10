@@ -1,4 +1,7 @@
 from dataset import IcasspDataModule
+import monai
+import pywt
+from models.basic import UNetModel
 from networks.baseline import Baseline
 from torch.utils.data import DataLoader
 import torch
@@ -12,22 +15,30 @@ dataloader = IcasspDataModule(hparams)
 
 dataloader.setup()
 
-train_loader = dataloader.train_dataloader()
-test_loader = dataloader.test_dataloader()
-val_loader = dataloader.val_dataloader()
-
-for thing in train_loader:
-    print(thing)
-train_in, train_out = train_loader(0)
-test_in, test_out = test_loader(0)
-val_in, val_out = val_loader(0)
-
-print(f"train: in [{train_in.size}] - out [{train_out.size}]")
-print(f"test: in [{test_in.size}] - out [{test_out.size}]")
-print(f"val: in [{val_in.size}] - out [{val_out.size}]")
-
-device = (
-    "cuda"
-    if torch.cuda.is_available()
-    else "mps" if torch.backends.mps.is_available() else "cpu"
+unet = monai.networks.nets.UNet(
+    spatial_dims=3,
+    in_channels=65,
+    out_channels=74,
+    channels=(8, 16, 32, 64),
+    strides=(2, 2, 2),
 )
+
+
+def dwt(input):
+    return torch.from_numpy(
+        pywt.coeffs_to_array(pywt.wavedecn(input, "db4", level=2), padding=0.0)
+    )
+
+
+model = UNetModel(
+    net=unet,
+    loss=torch.linalg.lstsq,
+    learning_rate=1e-2,
+    optimizer=torch.optim.AdamW,
+    dwt=dwt,
+)
+
+early_stop = pl.callbacks.early_stopping.EarlyStopping(monitor="val_loss")
+
+trainer = pl.Trainer(gpus=1, precision=16, callbacks=[early_stop])
+trainer.fit(model=model, datamodule=dataloader)

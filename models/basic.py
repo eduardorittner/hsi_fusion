@@ -1,13 +1,14 @@
 import pytorch_lightning as pl
 
 
-class UnetRModel(pl.LightningModule):
-    def __init__(self, net, loss, learning_rate, optimizer):
+class UNetModel(pl.LightningModule):
+    def __init__(self, net, loss, learning_rate, optimizer, dwt):
         super().__init__()
         self.lr = learning_rate
         self.net = net
         self.loss = loss
         self.optimizer_class = optimizer
+        self.dwt = dwt
 
     def load_batch(self, batch):
         input, target = batch
