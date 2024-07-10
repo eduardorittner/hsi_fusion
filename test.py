@@ -41,5 +41,5 @@ model = UNetModel(
 
 early_stop = pl.callbacks.early_stopping.EarlyStopping(monitor="val_loss")
 
-trainer = pl.Trainer(gpus=1, precision=16, callbacks=[early_stop])
+trainer = pl.Trainer(devices=1, accelerator="gpu", callbacks=[early_stop])
 trainer.fit(model=model, datamodule=dataloader)
