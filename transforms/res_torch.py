@@ -16,7 +16,16 @@ class ResTorch:
         hsi_out: Optional[torch.Tensor],
     ):
 
+        msi_in = torch.unsqueeze(msi_in, 0)
+        hsi_in = torch.unsqueeze(hsi_in, 0)
+        msi_in = torch.unsqueeze(msi_in, 1)
+        hsi_in = torch.unsqueeze(hsi_in, 1)
+
         if hsi_out is not None:
+            hsi_out = torch.unsqueeze(hsi_out, 0)
+            hsi_out = torch.unsqueeze(hsi_out, 1)
+
+            print(msi_in.size(), hsi_in.size(), hsi_out.size())
             return (
                 interpolate(
                     msi_in, size=(self.final_res, self.final_res, msi_in.size()[2])
