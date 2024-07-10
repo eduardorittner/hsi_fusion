@@ -8,6 +8,7 @@ import torch
 import torch.nn.functional as F
 from utils import checkpoint, read_yaml
 from transforms.get import get_transform
+import pytorch_lightning as pl
 
 hparams = read_yaml.read_yaml("/home/eduardo/hsi_fusion/models/example.yaml", False)
 
