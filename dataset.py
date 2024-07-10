@@ -124,7 +124,7 @@ class IcasspDataset(Dataset):
         dir_lens_match = (
             len(self.hsi_in)
             == len(self.msi_in)
-            == len(self.coeffs_out)
+            == len(self.hsi_out)
             == self.total_files
         )
 
