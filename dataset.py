@@ -168,7 +168,11 @@ class IcasspDataset(Dataset):
         if self.transform is not None:
             msi_in, hsi_in, hsi_out = self.transform(msi_in, hsi_in, hsi_out)
 
-        input = torch.cat((hsi_in, msi_in), 2)
+        msi_in = torch.swapaxes(msi_in, 0, 2)
+        hsi_in = torch.swapaxes(hsi_in, 0, 2)
+        hsi_out = torch.swapaxes(hsi_out, 0, 2)
+
+        input = torch.cat((hsi_in, msi_in), 0)
         target = hsi_out
 
         return input, target
