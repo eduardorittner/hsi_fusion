@@ -25,16 +25,22 @@ class ResTorch:
             hsi_out = torch.unsqueeze(hsi_out, 0)
             hsi_out = torch.unsqueeze(hsi_out, 1)
 
-            print(msi_in.size(), hsi_in.size(), hsi_out.size())
             return (
-                interpolate(
-                    msi_in, size=(self.final_res, self.final_res, msi_in.size()[2])
+                torch.squeeze(
+                    interpolate(
+                        msi_in, size=(self.final_res, self.final_res, msi_in.size()[4])
+                    )
                 ),
-                interpolate(
-                    hsi_in, size=(self.final_res, self.final_res, hsi_in.size()[2])
+                torch.squeeze(
+                    interpolate(
+                        hsi_in, size=(self.final_res, self.final_res, hsi_in.size()[4])
+                    )
                 ),
-                interpolate(
-                    hsi_out, size=(self.final_res, self.final_res, hsi_out.size()[2])
+                torch.squeeze(
+                    interpolate(
+                        hsi_out,
+                        size=(self.final_res, self.final_res, hsi_out.size()[4]),
+                    )
                 ),
             )
 

@@ -91,6 +91,7 @@ class IcasspDataset(Dataset):
         if self.preprocessing is None:
             fmt = "*.npy"
             is_coefficient = False
+
         elif self.preprocessing == "dwt":
             fmt = "*.npy"
             is_coefficient = True
