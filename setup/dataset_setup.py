@@ -14,39 +14,39 @@ from tqdm import tqdm
 
 
 def save2np(file, dest_path):
-    rgb_in_path = path.join(dest_path, "rgb_in")
     msi_in_path = path.join(dest_path, "msi_in")
-    msi_out_path = path.join(dest_path, "msi_out_path")
-
-    if not path.isdir(rgb_in_path):
-        os.mkdir(rgb_in_path)
+    hsi_in_path = path.join(dest_path, "hsi_in")
+    hsi_out_path = path.join(dest_path, "hsi_out")
 
     if not path.isdir(msi_in_path):
         os.mkdir(msi_in_path)
 
-    if not path.isdir(msi_out_path):
-        os.mkdir(msi_out_path)
+    if not path.isdir(hsi_in_path):
+        os.mkdir(hsi_in_path)
+
+    if not path.isdir(hsi_out_path):
+        os.mkdir(hsi_out_path)
 
     with h5py.File(file) as f:
         keys = list(f.keys())
 
         for key in tqdm(keys):
             arr = f[key][()]
-            rgb_in = arr[:4].T
-            msi_out_vis = arr[4:35]
-            msi_out_nir = arr[36:]  # Skip 35th band since it's a duplicate of 36
-            msi_out = np.concatenate((msi_out_vis, msi_out_nir), axis=0).T
+            msi_in = arr[:4].T
+            hsi_out_vis = arr[4:35]
+            hsi_out_nir = arr[36:]  # Skip 35th band since it's a duplicate of 36
+            hsi_out = np.concatenate((hsi_out_vis, hsi_out_nir), axis=0).T
 
-            msi_in = msi_out[::4, ::4, :]
+            hsi_in = hsi_out[::4, ::4, :]
 
-            np.save(path.join(rgb_in_path, key), rgb_in)
             np.save(path.join(msi_in_path, key), msi_in)
-            np.save(path.join(msi_out_path, key), msi_out)
+            np.save(path.join(hsi_in_path, key), hsi_in)
+            np.save(path.join(hsi_out_path, key), hsi_out)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Setup initial dataset with different files for rgb_in, msi_in and msi_out from .hdf file"
+        description="Setup initial dataset with different files for msi_in, hsi_in and hsi_out from .hdf file"
     )
 
     parser.add_argument(
@@ -72,6 +72,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    if args.train_source_file is not None:
+        print(
+            f"Loading files from train file: {args.train_source_file} into: {args.dest_dir}"
+        )
+        save2np(args.train_source_file, args.dest_dir)
+
     if args.val_source_file is not None:
-        print(f"Loading files from val file: {args.val_source_file} into: {args.dest_dir}")
+        print(
+            f"Loading files from val file: {args.val_source_file} into: {args.dest_dir}"
+        )
         save2np(args.val_source_file, args.dest_dir)
