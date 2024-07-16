@@ -10,7 +10,7 @@ def name(file):
     return file.split("/")[-1].split(".")[0]
 
 
-base_path = "/home/eduardo/data/msi_out/"
+base_path = "/home/eduardo/data/hsi_out/"
 dest_path = "/home/eduardo/data/coeffs/"
 
 files = sorted(glob.glob(path.join(base_path, "*.npy")))
