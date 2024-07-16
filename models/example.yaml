@@ -1,6 +1,6 @@
 data_path: "/home/eduardo/data/"
 
-transform: "512x512"
+transform: "256x256"
 
 batch_size: 1
 nworkers: 8

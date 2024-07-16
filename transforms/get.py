@@ -28,6 +28,14 @@ def get_transform(transform: str):
     if transform == "512x512":
         return ResTorch(256, 1024, 512)
 
+    if transform == "256x256":
+        return Compose(
+            [
+                Resolution(128, 256),  # Msi 256->128 / Hsi 1024->256
+                ResTorch(128, 256, 256),
+            ]
+        )
+
     if transform == "cnf512x512":
         return Compose(
             [
