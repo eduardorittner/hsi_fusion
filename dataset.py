@@ -152,10 +152,6 @@ class IcasspDataset(Dataset):
         return msi_in, hsi_in, hsi_out
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        """
-        Returns (hsi_in[1024,1024,61] + msi_in[1024,1024,61]) + (coeffs_out[1024,1024,61])
-        Resulting size is [122,1024,1024]
-        """
 
         msi_in, hsi_in, hsi_out = self.load_image(
             self.hsi_in[idx], self.msi_in[idx], self.hsi_out[idx]
@@ -168,9 +164,10 @@ class IcasspDataset(Dataset):
         if self.transform is not None:
             msi_in, hsi_in, hsi_out = self.transform(msi_in, hsi_in, hsi_out)
 
-        msi_in = torch.swapaxes(msi_in, 0, 2)
-        hsi_in = torch.swapaxes(hsi_in, 0, 2)
-        hsi_out = torch.swapaxes(hsi_out, 0, 2)
+        # Expects shape [bands, 1, x, y]
+        msi_in = torch.unsqueeze(torch.swapaxes(msi_in, 0, 2), 1)
+        hsi_in = torch.unsqueeze(torch.swapaxes(hsi_in, 0, 2), 1)
+        hsi_out = torch.unsqueeze(torch.swapaxes(hsi_out, 0, 2), 1)
 
         input = torch.cat((hsi_in, msi_in), 0)
         target = hsi_out
