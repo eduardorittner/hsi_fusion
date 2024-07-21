@@ -17,10 +17,10 @@ dataloader = IcasspDataModule(hparams)
 dataloader.setup()
 
 unet = monai.networks.nets.UNet(
-    spatial_dims=3,
+    spatial_dims=2,
     in_channels=65,
     out_channels=74,
-    channels=(8, 16, 32, 64),
+    channels=(2, 4, 8, 16),
     strides=(2, 2, 2),
 )
 
