@@ -165,9 +165,9 @@ class IcasspDataset(Dataset):
             msi_in, hsi_in, hsi_out = self.transform(msi_in, hsi_in, hsi_out)
 
         # Expects shape [bands, 1, x, y]
-        msi_in = torch.unsqueeze(torch.swapaxes(msi_in, 0, 2), 1)
-        hsi_in = torch.unsqueeze(torch.swapaxes(hsi_in, 0, 2), 1)
-        hsi_out = torch.unsqueeze(torch.swapaxes(hsi_out, 0, 2), 1)
+        msi_in = torch.swapaxes(msi_in, 0, 2)
+        hsi_in = torch.swapaxes(hsi_in, 0, 2)
+        hsi_out = torch.swapaxes(hsi_out, 0, 2)
 
         input = torch.cat((hsi_in, msi_in), 0)
         target = hsi_out
