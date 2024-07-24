@@ -24,6 +24,30 @@ unet = monai.networks.nets.UNet(
     strides=(2, 2, 2),
 )
 
+upsample = monai.networks.nets.Upsampling(
+    spatial_dims=2,
+    in_channels=74,
+    out_channels=74,
+    scale_factor=1.05,
+    kernel_size=3,
+    mode="deconv",
+)
+
+
+class UnetUpsample(torch.nn.Module):
+    def __init__(self, unet, upsample):
+        super().__init__()
+        self.unet = unet
+        self.up = upsample
+
+    def forward(self, x):
+        x = self.unet(x)
+        x = self.up(x)
+        return x
+
+
+model = UnetUpsample(unet, upsample)
+
 
 def dwt(input):
     return torch.from_numpy(
@@ -32,7 +56,7 @@ def dwt(input):
 
 
 model = UNetModel(
-    net=unet,
+    net=model,
     loss=torch.linalg.lstsq,
     learning_rate=1e-2,
     optimizer=torch.optim.AdamW,
