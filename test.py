@@ -24,7 +24,7 @@ unet = monai.networks.nets.UNet(
     strides=(2, 2, 2),
 )
 
-upsample = monai.networks.nets.Upsampling(
+upsample = monai.networks.blocks.Upsample(
     spatial_dims=2,
     in_channels=74,
     out_channels=74,
