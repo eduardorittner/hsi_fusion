@@ -28,9 +28,9 @@ upsample = monai.networks.blocks.Upsample(
     spatial_dims=2,
     in_channels=74,
     out_channels=74,
-    scale_factor=1.05,
-    kernel_size=3,
-    mode="deconv",
+    size=(269, 269),
+    mode="nontrainable",
+    interp_mode="bilinear",
 )
 
 
@@ -57,7 +57,7 @@ def dwt(input):
 
 model = UNetModel(
     net=model,
-    loss=torch.linalg.lstsq,
+    loss=monai.losses.ssim_loss.SSIMLoss(spatial_dims=2),
     learning_rate=1e-2,
     optimizer=torch.optim.AdamW,
     dwt=dwt,
