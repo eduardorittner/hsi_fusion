@@ -46,6 +46,8 @@ class UnetUpsample(torch.nn.Module):
         return x
 
 
+torch.set_float32_matmul_precision("medium")
+
 model = UnetUpsample(unet, upsample)
 
 
