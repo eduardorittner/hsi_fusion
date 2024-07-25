@@ -3,7 +3,7 @@ import numpy as np
 from typing import List, Dict
 
 
-def metric_ssim(result: np.ndarray, expected: np.ndarray) -> List[float]:
+def metric_ssim(result: np.ndarray, expected: np.ndarray) -> NDArray:
     """
     Returns the ssim (structural similarity index) of the result
     The first element is the ssim across all bands, and the subsequent elements
