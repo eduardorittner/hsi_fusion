@@ -1,7 +1,7 @@
 from dataset import IcasspDataModule
 import monai
 import pywt
-from models.basic import UNetModel
+from models.unet import UNetModel
 from networks.baseline import Baseline
 from torch.utils.data import DataLoader
 import torch
