@@ -164,7 +164,6 @@ class IcasspDataset(Dataset):
         if self.transform is not None:
             msi_in, hsi_in, hsi_out = self.transform(msi_in, hsi_in, hsi_out)
 
-        # Expects shape [bands, 1, x, y]
         msi_in = torch.swapaxes(msi_in, 0, 2)
         hsi_in = torch.swapaxes(hsi_in, 0, 2)
         hsi_out = torch.swapaxes(hsi_out, 0, 2)
