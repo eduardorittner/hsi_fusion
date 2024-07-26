@@ -38,9 +38,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # model = UnetModel.load_from_checkpoint(parser.checkpoint)
+    model = UnetModel.load_from_checkpoint(parser.checkpoint)
     # Disable randomness and such
-    # model.eval()
+    model.eval()
 
     if args.imageid is None:
         # Get random image
