@@ -41,65 +41,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    hparams = read_yaml("/home/eduardo/hsi_fusion/models/example.yaml", False)
-
-    dataloader = IcasspDataModule(hparams)
-
-    dataloader.setup()
-
-    unet = monai.networks.nets.UNet(
-        spatial_dims=2,
-        in_channels=65,
-        out_channels=74,
-        channels=(2, 4, 8, 16),
-        strides=(2, 2, 2),
-    )
-
-    upsample = monai.networks.blocks.Upsample(
-        spatial_dims=2,
-        in_channels=74,
-        out_channels=74,
-        size=(269, 269),
-        mode="nontrainable",
-        interp_mode="bilinear",
-    )
-
-    class UnetUpsample(torch.nn.Module):
-        def __init__(self, unet, upsample):
-            super().__init__()
-            self.unet = unet
-            self.up = upsample
-
-        def forward(self, x):
-            x = self.unet(x)
-            x = self.up(x)
-            return x
-
-    torch.set_float32_matmul_precision("medium")
-
-    model = UnetUpsample(unet, upsample)
-
-    def dwt(input):
-        return torch.from_numpy(
-            pywt.coeffs_to_array(pywt.wavedecn(input, "db4", level=2), padding=0.0)[0]
-        )
-
-    model = UNetModel(
-        net=model,
-        loss=monai.losses.ssim_loss.SSIMLoss(spatial_dims=2),
-        learning_rate=1e-2,
-        optimizer=torch.optim.AdamW,
-        dwt=dwt,
-    )
-
-    model = UNetModel.load_from_checkpoint(
-        args.checkpoint,
-        net=model,
-        loss=monai.losses.ssim_loss.SSIMLoss(spatial_dims=2),
-        learning_rate=1e-2,
-        optimizer=torch.optim.AdamW,
-        dwt=dwt,
-    )
+    model = UNetModel.load_from_checkpoint(args.checkpoint)
     # Disable randomness and such
     model.eval()
 
