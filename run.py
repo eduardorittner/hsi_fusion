@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    hparams = read_yaml.read_yaml("/home/eduardo/hsi_fusion/models/example.yaml", False)
+    hparams = read_yaml("/home/eduardo/hsi_fusion/models/example.yaml", False)
 
     dataloader = IcasspDataModule(hparams)
 
