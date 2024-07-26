@@ -1,4 +1,5 @@
 from os.path import join, isfile
+from transforms.get import get_transform
 import glob
 import yaml
 import pywt
@@ -59,6 +60,9 @@ if __name__ == "__main__":
         msi_in = torch.from_numpy(np.load(msi_file))
         hsi_in = torch.from_numpy(np.load(join(data_dir, f"hsi_in/{id}.npy")))
         hsi_out = torch.from_numpy(np.load(join(data_dir, f"hsi_out/{id}.npy")))
+
+        transform = get_transform("256x256")
+        msi_in, hsi_in, hsi_out = transform(msi_in, hsi_in, hsi_out)
 
         msi_in = torch.swapaxes(msi_in, 0, 2)
         hsi_in = torch.swapaxes(hsi_in, 0, 2)
