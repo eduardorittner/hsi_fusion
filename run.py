@@ -92,7 +92,14 @@ if __name__ == "__main__":
         dwt=dwt,
     )
 
-    model = model.load_from_checkpoint(args.checkpoint)
+    model = UNetModel.load_from_checkpoint(
+        args.checkpoint,
+        net=model,
+        loss=monai.losses.ssim_loss.SSIMLoss(spatial_dims=2),
+        learning_rate=1e-2,
+        optimizer=torch.optim.AdamW,
+        dwt=dwt,
+    )
     # Disable randomness and such
     model.eval()
 
