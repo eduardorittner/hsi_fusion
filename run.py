@@ -1,4 +1,5 @@
 from os.path import join, isfile
+from train import UnetUpsameple
 import monai
 from transforms.get import get_transform
 import glob
