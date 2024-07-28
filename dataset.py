@@ -15,6 +15,15 @@ class IcasspDataModule(LightningDataModule):
         super().__init__()
         self.save_hyperparameters(hparams)
 
+    def setup_nosplit(self):
+        base_path = self.hparams.data_path
+
+        files = (
+            self.hparams.train_split + self.hparams.val_split + self.hparams.test_split
+        )
+        transform = get_transform(self.hparams.transform)
+        self.all = IcasspDataset(base_path, files, transform, None)
+
     def setup(self, stage=None):
         base_path = self.hparams.data_path
 
@@ -62,6 +71,13 @@ class IcasspDataModule(LightningDataModule):
     def test_dataloader(self):
         return DataLoader(
             self.test,
+            batch_size=self.hparams.batch_size,
+            num_workers=self.hparams.nworkers,
+        )
+
+    def all_dataloader(self):
+        return DataLoader(
+            self.all,
             batch_size=self.hparams.batch_size,
             num_workers=self.hparams.nworkers,
         )
