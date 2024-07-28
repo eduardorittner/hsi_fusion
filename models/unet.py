@@ -1,5 +1,18 @@
 import pytorch_lightning as pl
 import torch
+import monai
+
+
+class UnetUpsample(torch.nn.Module):
+    def __init__(self, unet, upsample):
+        super().__init__()
+        self.unet = unet
+        self.up = upsample
+
+    def forward(self, x):
+        x = self.unet(x)
+        x = self.up(x)
+        return x
 
 
 class UNetModel(pl.LightningModule):
