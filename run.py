@@ -21,6 +21,13 @@ from metrics.psnr import metric_psnr
 
 data_dir = "/home/eduardo/data"
 
+
+def dwt(input):
+    return torch.from_numpy(
+        pywt.coeffs_to_array(pywt.wavedecn(input, "db4", level=2), padding=0.0)[0]
+    )
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
