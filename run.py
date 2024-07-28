@@ -50,6 +50,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model = UNetModel.load_from_checkpoint(args.checkpoint)
+
     # Disable randomness and such
     model.eval()
     model.freeze()
