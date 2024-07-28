@@ -1,5 +1,4 @@
 from os.path import join, isfile
-from train import UnetUpsameple
 import monai
 from transforms.get import get_transform
 import glob
@@ -7,7 +6,7 @@ import yaml
 import pywt
 import matplotlib.pyplot as plt
 import torch
-from models.unet import UNetModel
+from models.unet import UNetModel, UnetUpsample
 import argparse
 from random import choice
 from utils.image_id import image_id
