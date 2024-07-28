@@ -52,6 +52,7 @@ if __name__ == "__main__":
     model = UNetModel.load_from_checkpoint(args.checkpoint)
     # Disable randomness and such
     model.eval()
+    model.freeze()
 
     if args.imageid is None:
         # Get random image
