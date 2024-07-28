@@ -25,6 +25,9 @@ class UNetModel(pl.LightningModule):
         self.optimizer_class = optimizer
         self.dwt = dwt
 
+    def forward(self, x):
+        return self.net(x)
+
     def load_batch(self, batch):
         input, target = batch
         target = torch.unsqueeze(self.dwt(target.squeeze().cpu()).to("cuda"), 0)
