@@ -1,7 +1,7 @@
 from dataset import IcasspDataModule
 import monai
 import pywt
-from models.unet import UNetModel, UnetUpsample
+from models.unet import UNetModel
 from networks.baseline import Baseline
 from torch.utils.data import DataLoader
 import torch
@@ -21,31 +21,22 @@ if __name__ == "__main__":
     unet = monai.networks.nets.UNet(
         spatial_dims=2,
         in_channels=65,
-        out_channels=74,
+        out_channels=67,
         channels=(2, 4, 8, 16),
         strides=(2, 2, 2),
     )
 
-    upsample = monai.networks.blocks.Upsample(
-        spatial_dims=2,
-        in_channels=74,
-        out_channels=74,
-        size=(269, 269),
-        mode="nontrainable",
-        interp_mode="bilinear",
-    )
-
     torch.set_float32_matmul_precision("medium")
-
-    model = UnetUpsample(unet, upsample)
 
     def dwt(input):
         return torch.from_numpy(
-            pywt.coeffs_to_array(pywt.wavedecn(input, "db4", level=2), padding=0.0)[0]
+            pywt.coeffs_to_array(
+                pywt.wavedecn(input, "db4", level=2, mode="periodization"), padding=0.0
+            )[0]
         )
 
     model = UNetModel(
-        net=model,
+        net=unet,
         loss=monai.losses.ssim_loss.SSIMLoss(spatial_dims=2),
         learning_rate=1e-2,
         optimizer=torch.optim.AdamW,
