@@ -18,7 +18,7 @@ class UnetUpsample(torch.nn.Module):
 class UNetModel(pl.LightningModule):
     def __init__(self, net, loss, learning_rate, optimizer, dwt):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=["loss", "net"])
         self.lr = learning_rate
         self.net = net
         self.loss = loss
