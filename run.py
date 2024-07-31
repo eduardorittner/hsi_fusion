@@ -73,8 +73,6 @@ if __name__ == "__main__":
     # model.eval()
     # model.freeze()
 
-    input, out = dataloader.all[0][0]
-
     if args.imageid is None:
         # Get random image
         image = choice(glob.glob(join(data_dir, "msi_in/*.npy")))
@@ -90,20 +88,6 @@ if __name__ == "__main__":
             print(f"[ERROR]: Couldn't load file '{msi_file}'")
             continue
 
-        msi_in = torch.from_numpy(np.load(msi_file))
-        hsi_in = torch.from_numpy(np.load(join(data_dir, f"hsi_in/{id}.npy")))
-        hsi_out = torch.from_numpy(np.load(join(data_dir, f"hsi_out/{id}.npy")))
-
-        transform = get_transform("256x256")
-        msi_in, hsi_in, hsi_out = transform(msi_in, hsi_in, hsi_out)
-
-        msi_in = torch.swapaxes(msi_in, 0, 2)
-        hsi_in = torch.swapaxes(hsi_in, 0, 2)
-        hsi_out = torch.swapaxes(hsi_out, 0, 2)
-
-        input = torch.cat((hsi_in, msi_in), 0)
-        output = hsi_out
-
         # Predict the image using the trained model
         early_stop = pl.callbacks.early_stopping.EarlyStopping(monitor="val_loss")
         trainer = pl.Trainer(devices=1, accelerator="gpu", callbacks=[early_stop])
@@ -115,7 +99,7 @@ if __name__ == "__main__":
         )
         coeffs = pywt.array_to_coeffs(pred.numpy(), shapes)
         pred_image = pywt.waverecn(coeffs, wavelet="db2", mode="periodization")
-        output = output.numpy()
+        output = None
 
         ssim = metric_ssim(output, pred_image)
 
