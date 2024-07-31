@@ -5,6 +5,7 @@ import glob
 import yaml
 import pywt
 import matplotlib.pyplot as plt
+import pytorch_lightning as pl
 import torch
 from models.unet import UNetModel, UnetUpsample
 import argparse
@@ -23,7 +24,9 @@ data_dir = "/home/eduardo/data"
 
 def dwt(input):
     return torch.from_numpy(
-        pywt.coeffs_to_array(pywt.wavedecn(input, "db4", level=2), padding=0.0)[0]
+        pywt.coeffs_to_array(
+            pywt.wavedecn(input, "db4", level=2, mode="periodization"), padding=0.0
+        )[0]
     )
 
 
@@ -48,11 +51,29 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    model = UNetModel.load_from_checkpoint(args.checkpoint)
+    hparams = read_yaml("/home/eduardo/hsi_fusion/models/example.yaml", False)
+
+    dataloader = IcasspDataModule(hparams)
+
+    dataloader.setup_nosplit()
+
+    unet = monai.networks.nets.UNet(
+        spatial_dims=2,
+        in_channels=65,
+        out_channels=63,
+        channels=(2, 4, 8, 16),
+        strides=(2, 2, 2),
+    )
+
+    model = UNetModel.load_from_checkpoint(
+        args.checkpoint, net=unet, loss=torch.nn.MSELoss
+    )
 
     # Disable randomness and such
-    model.eval()
-    model.freeze()
+    # model.eval()
+    # model.freeze()
+
+    input, out = dataloader.all[0][0]
 
     if args.imageid is None:
         # Get random image
@@ -84,7 +105,9 @@ if __name__ == "__main__":
         output = hsi_out
 
         # Predict the image using the trained model
-        pred = model(input)
+        early_stop = pl.callbacks.early_stopping.EarlyStopping(monitor="val_loss")
+        trainer = pl.Trainer(devices=1, accelerator="gpu", callbacks=[early_stop])
+        pred = trainer.predict(model=model, dataloader=dataloader)
 
         # Inverse the coefficients
         shapes = pywt.wavedecn_shapes(
