@@ -21,7 +21,7 @@ if __name__ == "__main__":
     unet = monai.networks.nets.UNet(
         spatial_dims=2,
         in_channels=65,
-        out_channels=67,
+        out_channels=63,
         channels=(2, 4, 8, 16),
         strides=(2, 2, 2),
     )
