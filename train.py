@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     model = UNetModel(
         net=unet,
-        loss=monai.losses.ssim_loss.SSIMLoss(spatial_dims=2),
+        loss=torch.nn.MSELoss(),
         learning_rate=1e-2,
         optimizer=torch.optim.AdamW,
         dwt=dwt,
