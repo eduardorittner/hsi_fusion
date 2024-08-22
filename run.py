@@ -91,7 +91,7 @@ if __name__ == "__main__":
         # Predict the image using the trained model
         early_stop = pl.callbacks.early_stopping.EarlyStopping(monitor="val_loss")
         trainer = pl.Trainer(devices=1, accelerator="gpu", callbacks=[early_stop])
-        pred = trainer.predict(model=model, dataloader=dataloader)
+        pred = trainer.predict(model, dataloader)
 
         # Inverse the coefficients
         shapes = pywt.wavedecn_shapes(
