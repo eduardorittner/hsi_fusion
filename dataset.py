@@ -82,6 +82,9 @@ class IcasspDataModule(LightningDataModule):
             num_workers=self.hparams.nworkers,
         )
 
+    def predict_dataloader(self):
+        return self.all_dataloader()
+
 
 class IcasspDataset(Dataset):
     def __init__(
