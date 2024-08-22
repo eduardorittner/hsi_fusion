@@ -53,7 +53,10 @@ class UNetModel(pl.LightningModule):
         return loss
 
     def predict_step(self, batch, batch_idx):
-        return self.load_batch(batch)
+        input, target, index = batch
+        target = torch.unsqueeze(self.dwt(target.squeeze().cpu()).to("cuda"), 0)
+        pred = self.net(input)
+        return pred, target, index
 
     def configure_optimizers(self):
         optimizer = self.optimizer_class(self.parameters(), lr=self.lr)
