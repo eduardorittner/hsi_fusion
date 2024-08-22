@@ -22,7 +22,7 @@ class IcasspDataModule(LightningDataModule):
             self.hparams.train_split + self.hparams.val_split + self.hparams.test_split
         )
         transform = get_transform(self.hparams.transform)
-        self.all = IcasspDataset(base_path, files, transform, None)
+        self.all = IcasspDataset(base_path, files, transform, None, index=True)
 
     def setup(self, stage=None):
         base_path = self.hparams.data_path
@@ -38,6 +38,7 @@ class IcasspDataModule(LightningDataModule):
             train_split,
             train_transform,
             train_preprocessing,
+            index=False,
         )
 
         self.val = IcasspDataset(
@@ -45,6 +46,7 @@ class IcasspDataModule(LightningDataModule):
             val_split,
             train_transform,
             train_preprocessing,
+            index=False,
         )
 
         self.test = IcasspDataset(
@@ -52,6 +54,7 @@ class IcasspDataModule(LightningDataModule):
             test_split,
             train_transform,
             train_preprocessing,
+            index=False,
         )
 
     def train_dataloader(self):
@@ -94,6 +97,7 @@ class IcasspDataset(Dataset):
         transform: Optional[Callable] = None,
         preprocessing: Optional[str] = None,
         fold: Optional[int] = None,
+        index: Optional[bool],
         **kwargs,
     ):
         super().__init__()
@@ -106,6 +110,7 @@ class IcasspDataset(Dataset):
         self.transform = transform
         self.preprocessing = preprocessing
         self.fold = fold
+        self.index = index
 
         if self.preprocessing is None:
             fmt = "*.npy"
@@ -170,7 +175,7 @@ class IcasspDataset(Dataset):
 
         return msi_in, hsi_in, hsi_out
 
-    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self, idx: int):
 
         msi_in, hsi_in, hsi_out = self.load_image(
             self.hsi_in[idx], self.msi_in[idx], self.hsi_out[idx]
@@ -189,5 +194,8 @@ class IcasspDataset(Dataset):
 
         input = torch.cat((hsi_in, msi_in), 0)
         target = hsi_out
+
+        if self.index:
+            return input, target, idx
 
         return input, target
