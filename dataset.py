@@ -97,7 +97,7 @@ class IcasspDataset(Dataset):
         transform: Optional[Callable] = None,
         preprocessing: Optional[str] = None,
         fold: Optional[int] = None,
-        index: Optional[bool],
+        index: bool = False,
         **kwargs,
     ):
         super().__init__()
