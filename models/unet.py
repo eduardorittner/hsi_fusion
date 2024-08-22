@@ -53,8 +53,7 @@ class UNetModel(pl.LightningModule):
         return loss
 
     def predict_step(self, batch, batch_idx):
-        pred, target = self.load_batch(batch)
-        return pred, target
+        return self.load_batch(batch)
 
     def configure_optimizers(self):
         optimizer = self.optimizer_class(self.parameters(), lr=self.lr)
