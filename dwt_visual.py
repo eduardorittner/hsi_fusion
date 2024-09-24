@@ -20,9 +20,9 @@ if __name__ == "__main__":
         print("[ERROR]: Please provide both arguments")
         exit(1)
 
-    msi_in_files = sorted(glob.glob(join(args.source, "*.npy")))
-    hsi_in_files = sorted(glob.glob(join(args.source, "*.npy")))
-    hsi_out_files = sorted(glob.glob(join(args.source, "*.npy")))
+    msi_in_files = sorted(glob.glob(join(args.source, "msi_in/*.npy")))
+    hsi_in_files = sorted(glob.glob(join(args.source, "hsi_in/*.npy")))
+    hsi_out_files = sorted(glob.glob(join(args.source, "hsi_out/*.npy")))
 
     msi_in = next(filter(lambda x: args.id in x, msi_in_files), None)
     hsi_in = next(filter(lambda x: args.id in x, hsi_in_files), None)
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         hsi_out = np.load(hsi_out)
 
     else:
-        print("[ERROR]: Couldn't find file: {args.id}")
+        print(f"[ERROR]: Couldn't find file: {args.id}")
         exit(1)
 
     result = fuse_3dDWT(msi_in, hsi_in, "db1", 2, None)
