@@ -5,6 +5,7 @@ from os.path import join
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+from transforms.get import get_transform
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -36,6 +37,10 @@ if __name__ == "__main__":
     else:
         print(f"[ERROR]: Couldn't find file: {args.id}")
         exit(1)
+
+    transform = get_transform("1024x61_1024x61")
+
+    msi_in, hsi_in, hsi_out = transform(msi_in, hsi_in, hsi_out)
 
     result = fuse_3dDWT(msi_in, hsi_in, "db1", 2, None)
 
