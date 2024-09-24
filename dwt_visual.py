@@ -43,8 +43,10 @@ if __name__ == "__main__":
     msi_in, hsi_in, hsi_out = transform(msi_in, hsi_in, hsi_out)
 
     result = fuse_3dDWT(msi_in, hsi_in, "db1", 2, None)
+    average = fuse_average(msi_in, hsi_in, None)
+    d2 = fuse_2dDWT(msi_in, hsi_in, "db2", 2, None)
 
-    np.save(join(args.dest, "result.npy"), result)
-
-    plt.imshow(result[:, :, 20])
-    plt.show()
+    np.save(join(args.dest, "expected.npy"), hsi_out)
+    np.save(join(args.dest, "result3d.npy"), result)
+    np.save(join(args.dest, "result2d.npy"), d2)
+    np.save(join(args.dest, "resultaverage.npy"), average)
