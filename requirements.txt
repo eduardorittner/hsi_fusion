@@ -5,9 +5,8 @@ pytorch_lightning>=2.3
 monai>=1.3
 h5py>=3.11
 matplotlib>=3.9
-glob
 argparse
-yaml
+pyyaml
 scikit_image
 tqdm
 
