@@ -2,9 +2,9 @@
 
 import argparse
 import glob
-from os import path.join, isdir, mkdir
+from os.path import join, isdir, mkdir
 
-dataset_split(source_dir, dest_dir, move):
+def dataset_split(source_dir, dest_dir, move):
     """
     Split the dataset into 60% train, 20% val and 20% test
     """
